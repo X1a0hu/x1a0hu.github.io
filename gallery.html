@@ -6,15 +6,15 @@
     <meta name="theme-color" content="#f4f2ec" />
     <meta name="description" content="浮光，HULAB 的个人影像集。记录日常、光影与旅途。" />
     <meta property="og:title" content="浮光 · HULAB" />
-    <meta property="og:description" content="一些日常，一些偶然。把经过的光，留在这里。" />
+    <meta property="og:description" content="你总不忘提醒，再写上一些实况吧。" />
     <meta property="og:type" content="website" />
     <title>浮光 · HULAB</title>
     <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css?v=hulab-2" />
-    <link rel="stylesheet" href="./gallery.css?v=hulab-5" />
+    <link rel="stylesheet" href="./gallery.css?v=hulab-6" />
     <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./gallery.config.js?v=hulab-4"></script>
-    <script defer src="./gallery.js?v=hulab-5"></script>
+    <script defer src="./gallery.config.js?v=hulab-6"></script>
+    <script defer src="./gallery.js?v=hulab-6"></script>
   </head>
   <body class="gallery-body">
     <a class="skip-link" href="#gallery-grid">跳到照片墙</a>
@@ -37,7 +37,7 @@
           </div>
           <div class="gallery-intro">
             <span class="archive-label">THE PERSONAL ARCHIVE <span aria-hidden="true">↙</span></span>
-            <p class="gallery-subtitle" id="gallery-subtitle">一些日常，一些偶然。<br />把经过的光，留在这里。</p>
+            <p class="gallery-subtitle" id="gallery-subtitle">你总不忘提醒，再写上一些实况吧。</p>
             <p class="archive-range" id="archive-range"></p>
           </div>
         </section>
@@ -57,6 +57,13 @@
         </section>
 
         <p class="gallery-count sr-only" id="gallery-count" aria-live="polite"></p>
+        <div class="film-controls" id="film-controls" hidden>
+          <p id="film-hint">横向滑动胶卷 · 点击照片放大</p>
+          <div class="film-navigation" role="group" aria-label="滚动胶卷">
+            <button type="button" id="film-prev" aria-label="向前滚动胶卷" aria-controls="gallery-grid">←</button>
+            <button type="button" id="film-next" aria-label="向后滚动胶卷" aria-controls="gallery-grid">→</button>
+          </div>
+        </div>
         <section class="gallery-grid is-polaroid" id="gallery-grid" aria-label="实况照片墙">
           <noscript><p class="empty-note">请启用 JavaScript 以浏览照片。</p></noscript>
         </section>

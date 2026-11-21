@@ -3,7 +3,7 @@
 window.GALLERY_CONFIG = Object.freeze({
   eyebrow: 'A VISUAL JOURNAL',
   title: '浮光',
-  subtitle: '一些日常，一些偶然。\n把经过的光，留在这里。',
+  subtitle: '你总不忘提醒，再写上一些实况吧。',
 
   // 顶部「当下实况」状态栏（如果不想展示，可将 enabled 设为 false）
   nowStatus: {

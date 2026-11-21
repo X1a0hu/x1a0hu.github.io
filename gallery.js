@@ -44,6 +44,9 @@
   const gridEl = document.getElementById('gallery-grid');
   const filterBarEl = document.getElementById('filter-bar');
   const countEl = document.getElementById('gallery-count');
+  const filmControls = document.getElementById('film-controls');
+  const filmPrev = document.getElementById('film-prev');
+  const filmNext = document.getElementById('film-next');
 
   let activeFilter = 'all';
   let filteredItems = [...items];
@@ -57,6 +60,69 @@
     return item.image ? [item.image] : [];
   };
 
+  const isFilmView = () => gridEl.classList.contains('is-film');
+  function updateFilmControls() {
+    const maximum = gridEl.scrollWidth - gridEl.clientWidth;
+    filmPrev.disabled = gridEl.scrollLeft <= 1;
+    filmNext.disabled = gridEl.scrollLeft >= maximum - 1;
+  }
+  function scrollFilm(direction) {
+    const frame = gridEl.querySelector('.photo-card');
+    if (!frame) return;
+    gridEl.scrollBy({ left: direction * frame.getBoundingClientRect().width, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+  }
+  filmPrev.addEventListener('click', () => scrollFilm(-1));
+  filmNext.addEventListener('click', () => scrollFilm(1));
+  gridEl.addEventListener('scroll', updateFilmControls, { passive: true });
+  window.addEventListener('resize', updateFilmControls, { passive: true });
+  gridEl.addEventListener('wheel', event => {
+    if (!isFilmView() || event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+    const scale = event.deltaMode === 1 ? 20 : event.deltaMode === 2 ? gridEl.clientWidth : 1;
+    const delta = event.deltaY * scale;
+    const maximum = gridEl.scrollWidth - gridEl.clientWidth;
+    if ((delta > 0 && gridEl.scrollLeft >= maximum - 1) || (delta < 0 && gridEl.scrollLeft <= 1)) return;
+    event.preventDefault();
+    gridEl.scrollLeft += delta;
+  }, { passive: false });
+
+  let filmDrag = null;
+  let suppressClickUntil = 0;
+  gridEl.addEventListener('pointerdown', event => {
+    if (!isFilmView() || event.pointerType !== 'mouse' || event.button !== 0) return;
+    filmDrag = { pointerId: event.pointerId, startX: event.clientX, startScroll: gridEl.scrollLeft, moved: false };
+  });
+  window.addEventListener('pointermove', event => {
+    if (!filmDrag || event.pointerId !== filmDrag.pointerId) return;
+    const distance = event.clientX - filmDrag.startX;
+    if (!filmDrag.moved && Math.abs(distance) < 6) return;
+    if (!filmDrag.moved) {
+      filmDrag.moved = true;
+      gridEl.setPointerCapture(event.pointerId);
+      gridEl.classList.add('is-dragging');
+    }
+    event.preventDefault();
+    gridEl.scrollLeft = filmDrag.startScroll - distance;
+  }, { passive: false });
+  function endFilmDrag() {
+    if (!filmDrag) return;
+    const { pointerId, moved } = filmDrag;
+    filmDrag = null;
+    if (moved) suppressClickUntil = performance.now() + 250;
+    gridEl.classList.remove('is-dragging');
+    if (gridEl.hasPointerCapture(pointerId)) gridEl.releasePointerCapture(pointerId);
+  }
+  window.addEventListener('pointerup', endFilmDrag);
+  window.addEventListener('pointercancel', endFilmDrag);
+  window.addEventListener('blur', endFilmDrag);
+  gridEl.addEventListener('lostpointercapture', endFilmDrag);
+  gridEl.addEventListener('click', event => {
+    if (performance.now() < suppressClickUntil) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, true);
+  gridEl.addEventListener('dragstart', event => { if (isFilmView()) event.preventDefault(); });
+
   document.querySelectorAll('[data-view-mode]').forEach(btn => {
     btn.addEventListener('click', () => {
       const mode = btn.dataset.viewMode;
@@ -67,6 +133,11 @@
       });
       gridEl.classList.toggle('is-polaroid', mode === 'polaroid');
       gridEl.classList.toggle('is-film', mode === 'film');
+      filmControls.hidden = mode !== 'film';
+      if (mode === 'film') gridEl.setAttribute('aria-describedby', 'film-hint');
+      else gridEl.removeAttribute('aria-describedby');
+      gridEl.scrollLeft = 0;
+      requestAnimationFrame(updateFilmControls);
     });
   });
 
@@ -135,8 +206,11 @@
   // 渲染照片墙卡片
   function renderGrid() {
     if (!gridEl) return;
+    endFilmDrag();
     gridEl.querySelectorAll('video').forEach(video => video.pause());
     gridEl.textContent = '';
+    gridEl.scrollLeft = 0;
+    requestAnimationFrame(updateFilmControls);
 
     filteredItems = items.filter(item => {
       if (activeFilter === 'all') return true;
@@ -182,6 +256,7 @@
       img.alt = item.title || '画廊图片';
       img.loading = index < 2 ? 'eager' : 'lazy';
       img.decoding = 'async';
+      img.draggable = false;
       media.appendChild(img);
 
       let videoEl = null;
@@ -257,7 +332,13 @@
 
       card.addEventListener('click', () => openLightbox(index));
       card.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
+        if (isFilmView() && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+          event.preventDefault();
+          const cards = gridEl.querySelectorAll('.photo-card');
+          const target = cards[index + (event.key === 'ArrowRight' ? 1 : -1)];
+          target?.focus({ preventScroll: true });
+          target?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+        } else if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
           openLightbox(index);
         }
@@ -297,6 +378,9 @@
   function updateLightboxContent() {
     const item = filteredItems[activeLightboxIndex];
     if (!item) return;
+    gridEl.querySelectorAll('.photo-card').forEach((card, index) => {
+      card.classList.toggle('is-selected', index === activeLightboxIndex);
+    });
 
     const imgs = getItemImages(item);
     const currentSrc = imgs[activeSubImageIndex] || imgs[0] || '';
