@@ -3,49 +3,65 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#050709" />
-    <meta name="description" content="HULAB 的实况画廊与照片墙，记录光影切片与当下状态。" />
-    <meta property="og:title" content="画廊 · HULAB" />
-    <meta property="og:description" content="记录眼前的光影切片、随手拍下的画面与当下的实况。" />
+    <meta name="theme-color" content="#f4f2ec" />
+    <meta name="description" content="浮光，HULAB 的个人影像集。记录日常、光影与旅途。" />
+    <meta property="og:title" content="浮光 · HULAB" />
+    <meta property="og:description" content="一些日常，一些偶然。把经过的光，留在这里。" />
     <meta property="og:type" content="website" />
-    <title>画廊 · HULAB</title>
+    <title>浮光 · HULAB</title>
     <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css?v=hulab-2" />
-    <link rel="stylesheet" href="./gallery.css?v=hulab-3" />
+    <link rel="stylesheet" href="./gallery.css?v=hulab-4" />
     <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./gallery.config.js?v=hulab-3"></script>
-    <script defer src="./gallery.js?v=hulab-3"></script>
+    <script defer src="./gallery.config.js?v=hulab-4"></script>
+    <script defer src="./gallery.js?v=hulab-4"></script>
   </head>
   <body class="gallery-body">
     <a class="skip-link" href="#gallery-grid">跳到照片墙</a>
-    <div class="ambient" aria-hidden="true"></div>
 
     <div class="gallery-shell">
       <header class="gallery-topbar">
-        <a class="site-link back-home-link" href="./">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
-          <span>回到首页</span>
+        <a class="gallery-brand" href="./" aria-label="HULAB，回到首页">
+          <span>HULAB<span class="brand-dot">.</span></span>
+          <span class="brand-divider" aria-hidden="true">/</span>
+          <span class="brand-section">影像集</span>
         </a>
-
-        <div class="view-switcher" role="group" aria-label="画廊布局切换">
-          <button class="view-btn is-active" type="button" data-view-mode="bento" aria-pressed="true">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
-            <span>标准画廊</span>
-          </button>
-          <button class="view-btn" type="button" data-view-mode="polaroid" aria-pressed="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><rect x="7" y="6" width="10" height="9" rx="1"/><line x1="7" y1="18" x2="13" y2="18"/></svg>
-            <span>拍立得框</span>
-          </button>
-        </div>
+        <a class="back-home-link" href="./">返回首页 <span aria-hidden="true">↗</span></a>
       </header>
 
       <main class="gallery-main" aria-labelledby="gallery-title">
         <section class="gallery-hero">
-          <p class="panel-eyebrow" id="gallery-eyebrow">VISUAL ARCHIVE &amp; LIVE MOMENTS</p>
-          <h1 class="gallery-title" id="gallery-title">浮光 · 实况画廊</h1>
-          <p class="gallery-subtitle" id="gallery-subtitle">记录眼前的光影切片、随手拍下的画面与当下的实况。</p>
+          <div class="gallery-heading">
+            <p class="gallery-eyebrow" id="gallery-eyebrow">A VISUAL JOURNAL</p>
+            <h1 class="gallery-title" id="gallery-title">浮光<span class="title-period" aria-hidden="true">.</span></h1>
+          </div>
+          <div class="gallery-intro">
+            <span class="archive-label">THE PERSONAL ARCHIVE <span aria-hidden="true">↙</span></span>
+            <p class="gallery-subtitle" id="gallery-subtitle">一些日常，一些偶然。<br />把经过的光，留在这里。</p>
+            <p class="archive-range" id="archive-range"></p>
+          </div>
+        </section>
 
-          <div class="now-card" id="now-card">
+        <section class="gallery-controls" aria-label="画廊浏览方式">
+          <div class="filter-bar" id="filter-bar" role="group" aria-label="按分类筛选照片"></div>
+          <div class="view-switcher" role="group" aria-label="画廊布局切换">
+            <button class="view-btn is-active" type="button" data-view-mode="bento" aria-pressed="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="10" height="16"/><rect x="16" y="4" width="5" height="7"/><rect x="16" y="14" width="5" height="6"/></svg>
+              <span>画册</span>
+            </button>
+            <button class="view-btn" type="button" data-view-mode="polaroid" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18"/><path d="M7 6h10v9H7z"/></svg>
+              <span>拍立得</span>
+            </button>
+          </div>
+        </section>
+
+        <p class="gallery-count sr-only" id="gallery-count" aria-live="polite"></p>
+        <section class="gallery-grid is-bento" id="gallery-grid" aria-label="实况照片墙">
+          <noscript><p class="empty-note">请启用 JavaScript 以浏览照片。</p></noscript>
+        </section>
+
+          <aside class="now-card" id="now-card" hidden>
             <div class="now-badge-wrap">
               <span class="live-pulse" aria-hidden="true"></span>
               <span class="now-badge" id="now-badge">实况 · NOW</span>
@@ -56,33 +72,13 @@
               <span class="meta-dot" aria-hidden="true">·</span>
               <time class="now-time" id="now-time">2026.11.21</time>
             </div>
-          </div>
-        </section>
-
-        <section class="gallery-controls" aria-label="标签筛选">
-          <div class="filter-bar" id="filter-bar" role="toolbar" aria-label="按分类筛选实况与照片"></div>
-          <p class="gallery-count" id="gallery-count" aria-live="polite"></p>
-        </section>
-
-        <section class="gallery-grid is-bento" id="gallery-grid" aria-label="实况照片墙">
-          <noscript>
-            <div class="empty-note">
-              <span class="small-star" aria-hidden="true">✳</span>
-              <p>请启用 JavaScript 以浏览完整实况画廊与暗房灯箱。</p>
-            </div>
-          </noscript>
-        </section>
+          </aside>
       </main>
 
-      <footer class="footer gallery-footer">
-        <div class="footer-divider" aria-hidden="true"></div>
-        <div class="footer-meta">
-          <p>© <span id="year">2026</span> <span id="footer-name">HULAB</span></p>
-          <span class="meta-dot" aria-hidden="true">·</span>
-          <span>悬停或长按带有 LIVE 标识的卡片可预览实况动态</span>
-          <span class="meta-dot" aria-hidden="true">·</span>
-          <a class="source-link" href="./">返回主页</a>
-        </div>
+      <footer class="gallery-footer">
+        <p>© <span id="year">2026</span> <span id="footer-name">HULAB</span></p>
+        <span class="footer-caption">MOMENTS, COLLECTED.</span>
+        <a href="#gallery-title">回到顶部 <span aria-hidden="true">↑</span></a>
       </footer>
     </div>
 
@@ -93,7 +89,7 @@
         </button>
 
         <div class="lightbox-stage">
-          <button class="stage-nav stage-prev" type="button" id="lightbox-prev" aria-label="上一条实况">
+          <button class="stage-nav stage-prev" type="button" id="lightbox-prev" aria-label="上一组照片">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
           </button>
 
@@ -109,7 +105,7 @@
             <div class="lightbox-thumbs" id="lightbox-thumbs" hidden aria-label="同组照片切换"></div>
           </figure>
 
-          <button class="stage-nav stage-next" type="button" id="lightbox-next" aria-label="下一条实况">
+          <button class="stage-nav stage-next" type="button" id="lightbox-next" aria-label="下一组照片">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
           </button>
         </div>

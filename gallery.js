@@ -7,7 +7,7 @@
 
   const setText = (id, value) => {
     const el = document.getElementById(id);
-    if (el && value) el.textContent = value;
+    if (el && value !== undefined && value !== null) el.textContent = value;
   };
 
   const siteName = siteConfig.name || 'HULAB';
@@ -15,8 +15,16 @@
   setText('year', String(new Date().getFullYear()));
   setText('gallery-eyebrow', galleryConfig.eyebrow);
   setText('gallery-title', galleryConfig.title);
+  const titlePeriod = document.createElement('span');
+  titlePeriod.className = 'title-period';
+  titlePeriod.setAttribute('aria-hidden', 'true');
+  titlePeriod.textContent = '.';
+  document.getElementById('gallery-title').appendChild(titlePeriod);
   setText('gallery-subtitle', galleryConfig.subtitle);
   document.title = `${galleryConfig.title || '画廊'} · ${siteName}`;
+  const months = [...new Set(items.map(item => String(item.date || '').match(/^\d{4}\.\d{2}/)?.[0]).filter(Boolean))].sort();
+  const dateRange = months.length > 1 ? `${months[0]} — ${months[months.length - 1]}` : months[0];
+  setText('archive-range', [dateRange, `${String(items.length).padStart(2, '0')} MOMENTS`].filter(Boolean).join('   /   '));
 
   // 渲染顶部「当下实况」卡片
   const nowCard = document.getElementById('now-card');
@@ -25,6 +33,7 @@
     if (!nowStatus || nowStatus.enabled === false) {
       nowCard.hidden = true;
     } else {
+      nowCard.hidden = false;
       setText('now-badge', nowStatus.badge);
       setText('now-text', nowStatus.text);
       setText('now-mood', nowStatus.mood);
@@ -41,7 +50,8 @@
   let activeLightboxIndex = 0;
   let activeSubImageIndex = 0;
 
-  const isLiveItem = item => Boolean(item && (item.live || item.liveVideo));
+  const isLiveItem = item => Boolean(item?.liveVideo);
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const getItemImages = item => {
     if (Array.isArray(item.images) && item.images.length > 0) return item.images;
     return item.image ? [item.image] : [];
@@ -69,7 +79,7 @@
     const filters = [{ key: 'all', label: '全部', count: items.length }];
     const liveCount = items.filter(isLiveItem).length;
     if (liveCount > 0) {
-      filters.push({ key: '__live__', label: '◉ LIVE 实况', count: liveCount });
+      filters.push({ key: '__live__', label: 'LIVE', count: liveCount });
     }
 
     const tagCounts = new Map();
@@ -85,6 +95,7 @@
       btn.type = 'button';
       btn.className = `filter-chip${activeFilter === f.key ? ' is-active' : ''}`;
       btn.setAttribute('aria-pressed', String(activeFilter === f.key));
+      btn.dataset.filter = f.key;
 
       const labelSpan = document.createElement('span');
       labelSpan.textContent = f.label;
@@ -95,7 +106,11 @@
       btn.append(labelSpan, countSpan);
       btn.addEventListener('click', () => {
         activeFilter = f.key;
-        renderFilters();
+        filterBarEl.querySelectorAll('.filter-chip').forEach(filter => {
+          const selected = filter.dataset.filter === activeFilter;
+          filter.classList.toggle('is-active', selected);
+          filter.setAttribute('aria-pressed', String(selected));
+        });
         renderGrid();
       });
       filterBarEl.appendChild(btn);
@@ -103,6 +118,7 @@
   }
 
   function startCardLive(card, videoEl) {
+    if (reducedMotion.matches || dialog?.open) return;
     card.classList.add('is-live-playing');
     if (videoEl) {
       videoEl.currentTime = 0;
@@ -120,7 +136,9 @@
   // 渲染照片墙卡片
   function renderGrid() {
     if (!gridEl) return;
+    gridEl.querySelectorAll('video').forEach(video => video.pause());
     gridEl.textContent = '';
+    gridEl.classList.toggle('is-filtered', activeFilter !== 'all');
 
     filteredItems = items.filter(item => {
       if (activeFilter === 'all') return true;
@@ -151,10 +169,10 @@
     filteredItems.forEach((item, index) => {
       const card = document.createElement('article');
       card.className = 'photo-card';
-      card.dataset.span = item.span || 'normal';
       card.tabIndex = 0;
       card.setAttribute('role', 'button');
-      card.setAttribute('aria-label', `查看实况：${item.title || '未命名'}`);
+      card.setAttribute('aria-label', `查看照片：${item.title || '未命名'}`);
+      card.setAttribute('aria-haspopup', 'dialog');
 
       const media = document.createElement('div');
       media.className = 'card-media';
@@ -164,7 +182,8 @@
       img.className = 'card-img';
       img.src = imgs[0] || '';
       img.alt = item.title || '画廊图片';
-      img.loading = 'lazy';
+      img.loading = index < 2 ? 'eager' : 'lazy';
+      img.decoding = 'async';
       media.appendChild(img);
 
       let videoEl = null;
@@ -208,50 +227,34 @@
       const body = document.createElement('div');
       body.className = 'card-body';
 
-      const metaTop = document.createElement('div');
-      metaTop.className = 'card-meta-top';
-      if (item.tag) {
-        const tagSpan = document.createElement('span');
-        tagSpan.className = 'card-tag';
-        tagSpan.textContent = item.tag;
-        metaTop.appendChild(tagSpan);
-      }
-      if (item.date) {
-        const dateSpan = document.createElement('time');
-        dateSpan.textContent = item.date;
-        metaTop.appendChild(dateSpan);
-      }
-      if (item.location) {
-        const locSpan = document.createElement('span');
-        locSpan.className = 'card-location';
-        locSpan.textContent = `· ${item.location}`;
-        metaTop.appendChild(locSpan);
-      }
+      const number = document.createElement('span');
+      number.className = 'card-number';
+      number.textContent = String(items.indexOf(item) + 1).padStart(2, '0');
+      const caption = document.createElement('div');
 
       const titleEl = document.createElement('h2');
       titleEl.className = 'card-title';
       titleEl.textContent = item.title || '';
 
-      const noteEl = document.createElement('p');
-      noteEl.className = 'card-note';
-      noteEl.textContent = item.note || '';
-
-      const footer = document.createElement('div');
-      footer.className = 'card-footer';
-      const exifSpan = document.createElement('span');
-      exifSpan.textContent = item.meta || (isLiveItem(item) ? 'Live Moment' : 'Photo Note');
-      const openHint = document.createElement('span');
-      openHint.className = 'card-open-hint';
-      openHint.textContent = '暗房查看 ↗';
-      footer.append(exifSpan, openHint);
-
-      body.append(metaTop, titleEl, noteEl, footer);
+      const details = document.createElement('p');
+      details.className = 'card-caption';
+      [item.location, item.tag].filter(Boolean).forEach(value => {
+        const detail = document.createElement('span');
+        detail.textContent = value;
+        details.appendChild(detail);
+      });
+      caption.append(titleEl, details);
+      const date = document.createElement('time');
+      date.className = 'card-date';
+      date.textContent = String(item.date || '').split(' · ')[0];
+      body.append(number, caption, date);
       card.append(media, body);
 
       // 实况悬停 / 触摸预览
       if (isLiveItem(item)) {
         card.addEventListener('pointerenter', () => startCardLive(card, videoEl));
         card.addEventListener('pointerleave', () => stopCardLive(card, videoEl));
+        card.addEventListener('blur', () => stopCardLive(card, videoEl));
       }
 
       card.addEventListener('click', () => openLightbox(index));
@@ -281,6 +284,8 @@
     if (!mediaWrap) return;
     mediaWrap.classList.toggle('is-live-playing', playing);
     lightboxLiveBtn?.classList.toggle('is-active', playing);
+    lightboxLiveBtn?.setAttribute('aria-pressed', String(playing));
+    lightboxLiveBtn?.setAttribute('aria-label', playing ? '暂停实况动态' : '播放实况动态');
     if (lightboxVideo && !lightboxVideo.hidden) {
       if (playing) {
         lightboxVideo.currentTime = 0;
@@ -317,7 +322,7 @@
     }
 
     if (lightboxLiveBtn) {
-      lightboxLiveBtn.hidden = !isLiveItem(item);
+      lightboxLiveBtn.hidden = !isLiveItem(item) || activeSubImageIndex !== 0;
     }
 
     // 渲染多图缩略图切换器
@@ -330,6 +335,7 @@
           btn.type = 'button';
           btn.className = `thumb-btn${idx === activeSubImageIndex ? ' is-active' : ''}`;
           btn.setAttribute('aria-label', `第 ${idx + 1} 张照片`);
+          btn.setAttribute('aria-pressed', String(idx === activeSubImageIndex));
           const tImg = document.createElement('img');
           tImg.src = src;
           tImg.alt = '';
@@ -337,6 +343,7 @@
           btn.addEventListener('click', () => {
             activeSubImageIndex = idx;
             updateLightboxContent();
+            lightboxThumbs.querySelectorAll('button')[idx]?.focus();
           });
           lightboxThumbs.appendChild(btn);
         });
@@ -351,6 +358,8 @@
     setText('lightbox-date', item.date || '');
     setText('lightbox-title', item.title || '');
     setText('lightbox-note', item.note || '');
+    prevBtn.disabled = filteredItems.length < 2;
+    nextBtn.disabled = filteredItems.length < 2;
 
     const locWrap = document.getElementById('lightbox-location-wrap');
     if (locWrap) {
@@ -367,6 +376,7 @@
 
   function openLightbox(index) {
     if (!dialog?.showModal || !filteredItems[index]) return;
+    gridEl.querySelectorAll('.photo-card').forEach(card => stopCardLive(card, card.querySelector('video')));
     activeLightboxIndex = index;
     activeSubImageIndex = 0;
     updateLightboxContent();
@@ -384,14 +394,17 @@
   nextBtn?.addEventListener('click', () => stepLightbox(1));
   closeBtn?.addEventListener('click', () => dialog?.close());
 
-  lightboxLiveBtn?.addEventListener('pointerenter', () => setLightboxLivePlaying(true));
-  lightboxLiveBtn?.addEventListener('pointerleave', () => setLightboxLivePlaying(false));
   lightboxLiveBtn?.addEventListener('click', () => {
     const active = mediaWrap?.classList.contains('is-live-playing');
     setLightboxLivePlaying(!active);
   });
 
   dialog?.addEventListener('close', () => setLightboxLivePlaying(false));
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) return;
+    gridEl.querySelectorAll('.photo-card').forEach(card => stopCardLive(card, card.querySelector('video')));
+    setLightboxLivePlaying(false);
+  });
   dialog?.addEventListener('click', event => {
     const rect = dialog.getBoundingClientRect();
     if (

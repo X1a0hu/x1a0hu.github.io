@@ -1,13 +1,13 @@
 // 修改此文件即可更新「画廊 · 实况」页面的当下状态与照片墙内容。
 // 图片建议放在 ./photos/ 目录下；支持单图、多图（images 数组）以及实况视频（liveVideo）。
 window.GALLERY_CONFIG = Object.freeze({
-  eyebrow: 'VISUAL ARCHIVE & LIVE MOMENTS',
-  title: '浮光 · 实况画廊',
-  subtitle: '记录眼前的光影切片、随手拍下的画面与当下的实况。',
+  eyebrow: 'A VISUAL JOURNAL',
+  title: '浮光',
+  subtitle: '一些日常，一些偶然。\n把经过的光，留在这里。',
 
   // 顶部「当下实况」状态栏（如果不想展示，可将 enabled 设为 false）
   nowStatus: {
-    enabled: true,
+    enabled: false,
     badge: '实况 · NOW',
     text: '正在搭建个人空间的暗房画廊，把日常随手拍和即时想法慢慢收纳进这里。',
     updatedAt: '2026.11.21',
@@ -15,7 +15,7 @@ window.GALLERY_CONFIG = Object.freeze({
   },
 
   // 照片墙条目：
-  // - live: true 开启实况动态感；如提供 liveVideo: './photos/xxx.mp4' 则悬停/长按时播放实况视频
+  // - liveVideo: './photos/xxx.mp4' 开启 LIVE 标识；悬停预览，或在大图中点击播放
   // - images: 可选多图数组，点击卡片进入暗房灯箱后可左右翻看同一组照片
   items: [
     {
