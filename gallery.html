@@ -3,22 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f5f9ff" />
+    <meta name="theme-color" content="#000000" />
     <meta name="description" content="浮光，HULAB 的个人影像集。记录日常、光影与旅途。" />
     <meta property="og:title" content="浮光 · HULAB" />
     <meta property="og:description" content="你总不忘提醒，再写上一些实况吧。" />
     <meta property="og:type" content="website" />
     <title>浮光 · HULAB</title>
     <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=hulab-2" />
-    <link rel="stylesheet" href="./gallery.css?v=hulab-12" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600&family=Space+Grotesk:wght@500;700&display=swap" />
+    <link rel="stylesheet" href="./styles.css?v=hulab-3" />
+    <link rel="stylesheet" href="./gallery.css?v=hulab-15" />
     <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./gallery.config.js?v=hulab-12"></script>
-    <script defer src="./gallery.js?v=hulab-12"></script>
+    <script defer src="./gallery.config.js?v=hulab-15"></script>
+    <script defer src="./gallery.js?v=hulab-15"></script>
   </head>
   <body class="gallery-body">
     <a class="skip-link" href="#gallery-grid">跳到照片墙</a>
-    <div class="ambient" aria-hidden="true"></div>
 
     <div class="gallery-shell">
       <header class="gallery-topbar">
@@ -45,20 +47,10 @@
 
         <section class="gallery-controls" aria-label="画廊浏览方式">
           <div class="filter-bar" id="filter-bar" role="group" aria-label="按分类筛选照片"></div>
-          <div class="view-switcher" role="group" aria-label="画廊布局切换">
-            <button class="view-btn is-active" type="button" data-view-mode="polaroid" aria-pressed="true">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18"/><path d="M7 6h10v9H7z"/></svg>
-              <span>拍立得</span>
-            </button>
-            <button class="view-btn" type="button" data-view-mode="film" aria-pressed="false">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="1"/><path d="M2 7h20M2 17h20M7 3v4m5-4v4m5-4v4M7 17v4m5-4v4m5-4v4"/></svg>
-              <span>胶卷</span>
-            </button>
-          </div>
         </section>
 
         <p class="gallery-count sr-only" id="gallery-count" aria-live="polite"></p>
-        <section class="gallery-grid is-polaroid" id="gallery-grid" aria-label="实况照片墙">
+        <section class="gallery-grid is-film" id="gallery-grid" aria-label="实况照片墙">
           <noscript><p class="empty-note">请启用 JavaScript 以浏览照片。</p></noscript>
         </section>
 

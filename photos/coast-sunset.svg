@@ -1,32 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
   <defs>
-    <linearGradient id="seaSky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="42%" stop-color="#60a5fa"/>
-      <stop offset="72%" stop-color="#bae6fd"/>
-      <stop offset="76%" stop-color="#f0f9ff"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
+    <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#070e17"/>
+      <stop offset="45%" stop-color="#13283c"/>
+      <stop offset="72%" stop-color="#334c5e"/>
+      <stop offset="88%" stop-color="#c48a6a"/>
+      <stop offset="100%" stop-color="#0a1017"/>
     </linearGradient>
-    <radialGradient id="horizonGlow" cx="50%" cy="74%" r="38%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96"/>
-      <stop offset="45%" stop-color="#bae6fd" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+    <radialGradient id="sun" cx="50%" cy="76%" r="35%">
+      <stop offset="0%" stop-color="#ffe6b8" stop-opacity="0.85"/>
+      <stop offset="40%" stop-color="#f39c6b" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#13283c" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#1e3a8a"/>
-    </linearGradient>
   </defs>
-  <rect width="1000" height="1000" fill="url(#seaSky)"/>
-  <rect width="1000" height="1000" fill="url(#horizonGlow)"/>
-  <circle cx="500" cy="728" r="68" fill="#ffffff" fill-opacity="0.95"/>
-  <!-- Deep azure sea & white shimmer reflections -->
-  <rect x="0" y="758" width="1000" height="242" fill="url(#ocean)"/>
-  <g stroke="#ffffff" stroke-linecap="round">
-    <line x1="395" y1="776" x2="605" y2="776" stroke-opacity="0.88" stroke-width="3.5"/>
-    <line x1="420" y1="794" x2="580" y2="794" stroke-opacity="0.72" stroke-width="3"/>
-    <line x1="442" y1="814" x2="558" y2="814" stroke-opacity="0.58" stroke-width="2.5"/>
-    <line x1="458" y1="836" x2="542" y2="836" stroke-opacity="0.45" stroke-width="2"/>
-    <line x1="474" y1="860" x2="526" y2="860" stroke-opacity="0.32" stroke-width="1.8"/>
+  <rect width="1000" height="1000" fill="url(#dusk)"/>
+  <rect width="1000" height="1000" fill="url(#sun)"/>
+  <circle cx="500" cy="740" r="64" fill="#fff1d6" fill-opacity="0.85"/>
+  <!-- Sea / horizon reflections -->
+  <rect x="0" y="765" width="1000" height="235" fill="#070d14"/>
+  <g stroke="#ffd9a8" stroke-linecap="round">
+    <line x1="410" y1="782" x2="590" y2="782" stroke-opacity="0.65" stroke-width="3"/>
+    <line x1="430" y1="798" x2="570" y2="798" stroke-opacity="0.5" stroke-width="2.5"/>
+    <line x1="448" y1="816" x2="552" y2="816" stroke-opacity="0.4" stroke-width="2"/>
+    <line x1="460" y1="836" x2="540" y2="836" stroke-opacity="0.3" stroke-width="2"/>
+    <line x1="475" y1="860" x2="525" y2="860" stroke-opacity="0.2" stroke-width="1.5"/>
   </g>
 </svg>
