@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f4f2ec" />
+    <meta name="theme-color" content="#f5f9ff" />
     <meta name="description" content="浮光，HULAB 的个人影像集。记录日常、光影与旅途。" />
     <meta property="og:title" content="浮光 · HULAB" />
     <meta property="og:description" content="你总不忘提醒，再写上一些实况吧。" />
@@ -11,13 +11,14 @@
     <title>浮光 · HULAB</title>
     <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css?v=hulab-2" />
-    <link rel="stylesheet" href="./gallery.css?v=hulab-6" />
+    <link rel="stylesheet" href="./gallery.css?v=hulab-12" />
     <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./gallery.config.js?v=hulab-6"></script>
-    <script defer src="./gallery.js?v=hulab-6"></script>
+    <script defer src="./gallery.config.js?v=hulab-12"></script>
+    <script defer src="./gallery.js?v=hulab-12"></script>
   </head>
   <body class="gallery-body">
     <a class="skip-link" href="#gallery-grid">跳到照片墙</a>
+    <div class="ambient" aria-hidden="true"></div>
 
     <div class="gallery-shell">
       <header class="gallery-topbar">
@@ -57,13 +58,6 @@
         </section>
 
         <p class="gallery-count sr-only" id="gallery-count" aria-live="polite"></p>
-        <div class="film-controls" id="film-controls" hidden>
-          <p id="film-hint">横向滑动胶卷 · 点击照片放大</p>
-          <div class="film-navigation" role="group" aria-label="滚动胶卷">
-            <button type="button" id="film-prev" aria-label="向前滚动胶卷" aria-controls="gallery-grid">←</button>
-            <button type="button" id="film-next" aria-label="向后滚动胶卷" aria-controls="gallery-grid">→</button>
-          </div>
-        </div>
         <section class="gallery-grid is-polaroid" id="gallery-grid" aria-label="实况照片墙">
           <noscript><p class="empty-note">请启用 JavaScript 以浏览照片。</p></noscript>
         </section>
@@ -108,6 +102,7 @@
                 <span class="live-icon" aria-hidden="true"></span>
                 <span>LIVE</span>
               </button>
+              <span class="multi-pill lightbox-subcount" id="lightbox-subcount" hidden></span>
             </div>
             <div class="lightbox-thumbs" id="lightbox-thumbs" hidden aria-label="同组照片切换"></div>
           </figure>

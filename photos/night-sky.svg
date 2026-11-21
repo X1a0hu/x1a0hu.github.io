@@ -1,37 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
   <defs>
-    <radialGradient id="g1" cx="68%" cy="32%" r="65%">
-      <stop offset="0%" stop-color="#7fd6ff" stop-opacity="0.72"/>
-      <stop offset="35%" stop-color="#3c6e91" stop-opacity="0.38"/>
-      <stop offset="70%" stop-color="#111d2a" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#06090d"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e62d0"/>
+      <stop offset="48%" stop-color="#4ea1f5"/>
+      <stop offset="82%" stop-color="#a7d7ff"/>
+      <stop offset="100%" stop-color="#e8f5ff"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="72%" cy="28%" r="48%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#cbe8ff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#4ea1f5" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="g2" cx="24%" cy="74%" r="55%">
-      <stop offset="0%" stop-color="#f2a65a" stop-opacity="0.45"/>
-      <stop offset="45%" stop-color="#6c4575" stop-opacity="0.28"/>
-      <stop offset="100%" stop-color="#06090d" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#05080c" stop-opacity="0"/>
-      <stop offset="75%" stop-color="#081018" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#040608" stop-opacity="0.96"/>
+    <linearGradient id="ridge1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a9be8" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#2e6ec2" stop-opacity="0.92"/>
+    </linearGradient>
+    <linearGradient id="ridge2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2864b8"/>
+      <stop offset="100%" stop-color="#163e7a"/>
     </linearGradient>
   </defs>
-  <rect width="1200" height="800" fill="#06090d"/>
-  <rect width="1200" height="800" fill="url(#g1)"/>
-  <rect width="1200" height="800" fill="url(#g2)"/>
-  <circle cx="816" cy="256" r="54" fill="#e8f8ff" fill-opacity="0.88"/>
-  <circle cx="816" cy="256" r="110" fill="#89dcff" fill-opacity="0.16"/>
-  <g fill="#d9f2ff" fill-opacity="0.55">
-    <circle cx="190" cy="140" r="1.6"/>
-    <circle cx="340" cy="110" r="1.2"/>
-    <circle cx="520" cy="180" r="2"/>
-    <circle cx="660" cy="96" r="1.4"/>
-    <circle cx="980" cy="144" r="1.8"/>
-    <circle cx="1050" cy="290" r="1.3"/>
-    <circle cx="260" cy="310" r="1.5"/>
+  <rect width="1200" height="800" fill="url(#sky)"/>
+  <rect width="1200" height="800" fill="url(#sunGlow)"/>
+  <!-- Sun & halo -->
+  <circle cx="864" cy="224" r="56" fill="#ffffff" fill-opacity="0.95"/>
+  <circle cx="864" cy="224" r="120" fill="#ffffff" fill-opacity="0.22"/>
+  <!-- Soft layered white clouds -->
+  <g fill="#ffffff" fill-opacity="0.82">
+    <ellipse cx="280" cy="430" rx="170" ry="44"/>
+    <ellipse cx="380" cy="420" rx="130" ry="52"/>
+    <ellipse cx="210" cy="442" rx="110" ry="34"/>
+    <ellipse cx="780" cy="470" rx="190" ry="38" fill-opacity="0.68"/>
+    <ellipse cx="890" cy="458" rx="140" ry="46" fill-opacity="0.74"/>
   </g>
-  <path d="M0 610 Q240 535 470 585 T940 555 T1200 590 L1200 800 L0 800 Z" fill="#0b141d" fill-opacity="0.88"/>
-  <path d="M0 655 Q330 595 640 638 T1200 620 L1200 800 L0 800 Z" fill="#05080c"/>
-  <rect width="1200" height="800" fill="url(#horizon)"/>
+  <!-- Distant blue hills -->
+  <path d="M0 595 Q240 515 490 572 T960 540 T1200 575 L1200 800 L0 800 Z" fill="url(#ridge1)"/>
+  <path d="M0 648 Q340 585 660 632 T1200 612 L1200 800 L0 800 Z" fill="url(#ridge2)"/>
 </svg>

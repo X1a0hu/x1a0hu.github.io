@@ -27,10 +27,10 @@ window.GALLERY_CONFIG = Object.freeze({
       location: '窗边',
       meta: '24mm · f/1.4 · ISO 800',
       live: true,
-      image: './photos/night-sky.svg',
+      image: './photos/night-sky.svg?v=blue',
       images: [
-        './photos/night-sky.svg',
-        './photos/coast-sunset.svg',
+        './photos/night-sky.svg?v=blue',
+        './photos/coast-sunset.svg?v=blue',
       ],
     },
     {
@@ -42,7 +42,7 @@ window.GALLERY_CONFIG = Object.freeze({
       location: '街角',
       meta: '50mm · f/1.8 · LIVE',
       live: true,
-      image: './photos/rain-window.svg',
+      image: './photos/rain-window.svg?v=blue',
     },
     {
       id: 'late-night-desk',
@@ -53,7 +53,7 @@ window.GALLERY_CONFIG = Object.freeze({
       location: '书桌',
       meta: 'Desk Setup · Coding',
       live: false,
-      image: './photos/late-desk.svg',
+      image: './photos/late-desk.svg?v=blue',
     },
     {
       id: 'coast-dusk',
@@ -64,7 +64,7 @@ window.GALLERY_CONFIG = Object.freeze({
       location: '海岸线',
       meta: '35mm · f/2.0 · Golden Hour',
       live: true,
-      image: './photos/coast-sunset.svg',
+      image: './photos/coast-sunset.svg?v=blue',
     },
   ],
 });
