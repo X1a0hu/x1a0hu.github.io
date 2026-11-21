@@ -11,10 +11,10 @@
     <title>浮光 · HULAB</title>
     <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css?v=hulab-2" />
-    <link rel="stylesheet" href="./gallery.css?v=hulab-4" />
+    <link rel="stylesheet" href="./gallery.css?v=hulab-5" />
     <script defer src="./site.config.js?v=hulab-2"></script>
     <script defer src="./gallery.config.js?v=hulab-4"></script>
-    <script defer src="./gallery.js?v=hulab-4"></script>
+    <script defer src="./gallery.js?v=hulab-5"></script>
   </head>
   <body class="gallery-body">
     <a class="skip-link" href="#gallery-grid">跳到照片墙</a>
@@ -45,19 +45,19 @@
         <section class="gallery-controls" aria-label="画廊浏览方式">
           <div class="filter-bar" id="filter-bar" role="group" aria-label="按分类筛选照片"></div>
           <div class="view-switcher" role="group" aria-label="画廊布局切换">
-            <button class="view-btn is-active" type="button" data-view-mode="bento" aria-pressed="true">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="10" height="16"/><rect x="16" y="4" width="5" height="7"/><rect x="16" y="14" width="5" height="6"/></svg>
-              <span>画册</span>
-            </button>
-            <button class="view-btn" type="button" data-view-mode="polaroid" aria-pressed="false">
+            <button class="view-btn is-active" type="button" data-view-mode="polaroid" aria-pressed="true">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18"/><path d="M7 6h10v9H7z"/></svg>
               <span>拍立得</span>
+            </button>
+            <button class="view-btn" type="button" data-view-mode="film" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="1"/><path d="M2 7h20M2 17h20M7 3v4m5-4v4m5-4v4M7 17v4m5-4v4m5-4v4"/></svg>
+              <span>胶卷</span>
             </button>
           </div>
         </section>
 
         <p class="gallery-count sr-only" id="gallery-count" aria-live="polite"></p>
-        <section class="gallery-grid is-bento" id="gallery-grid" aria-label="实况照片墙">
+        <section class="gallery-grid is-polaroid" id="gallery-grid" aria-label="实况照片墙">
           <noscript><p class="empty-note">请启用 JavaScript 以浏览照片。</p></noscript>
         </section>
 

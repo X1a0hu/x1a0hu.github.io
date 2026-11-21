@@ -57,7 +57,6 @@
     return item.image ? [item.image] : [];
   };
 
-  // 视图切换（Bento 画廊 / 拍立得墙）
   document.querySelectorAll('[data-view-mode]').forEach(btn => {
     btn.addEventListener('click', () => {
       const mode = btn.dataset.viewMode;
@@ -66,8 +65,8 @@
         b.classList.toggle('is-active', active);
         b.setAttribute('aria-pressed', String(active));
       });
-      gridEl.classList.toggle('is-bento', mode === 'bento');
       gridEl.classList.toggle('is-polaroid', mode === 'polaroid');
+      gridEl.classList.toggle('is-film', mode === 'film');
     });
   });
 
@@ -138,7 +137,6 @@
     if (!gridEl) return;
     gridEl.querySelectorAll('video').forEach(video => video.pause());
     gridEl.textContent = '';
-    gridEl.classList.toggle('is-filtered', activeFilter !== 'all');
 
     filteredItems = items.filter(item => {
       if (activeFilter === 'all') return true;
