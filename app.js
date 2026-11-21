@@ -7,7 +7,7 @@
   setText('tagline', config.tagline);
   setText('intro', config.intro);
   setText('about-description', config.about);
-  document.querySelectorAll('[data-profile-name]').forEach(node => { node.textContent = config.name || 'Hunch'; });
+  document.querySelectorAll('[data-profile-name]').forEach(node => { node.textContent = config.name || 'HULAB'; });
   document.getElementById('year').textContent = new Date().getFullYear();
   if (config.name) document.title = `${config.name} · 个人空间`;
   if (config.intro) {
