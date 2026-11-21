@@ -5,7 +5,7 @@
 ## 文件
 
 - `index.html`：首页，以及笔记和关于弹窗。
-- `site.config.js`：名字、标语、简介和 GitHub 地址。
+- `site.config.js`：名字、简介和 GitHub 地址。
 - `styles.css`：桌面和手机布局。
 - `app.js`：弹窗、动画控制、配置和无障碍交互。
 - `vendor/fluid.js`：含 MIT 许可证的 WebGL 流体渲染器。
@@ -41,7 +41,6 @@ python -m http.server 4173
 ## 动画
 
 - 在首页空白处点击或拖动，注入彩色流体。
-- 页脚可以暂停/恢复光效，选择保存在本地。
 - 系统开启“减少动态效果”时不启动 WebGL。
 - 切到后台或打开弹窗时暂停；不支持 WebGL 时保留静态背景。
 - 支持键盘导航、弹窗焦点约束和 Escape 关闭。

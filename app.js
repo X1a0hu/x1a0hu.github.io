@@ -4,16 +4,10 @@
   const setText = (id, value) => { if (value) document.getElementById(id).textContent = value; };
   setText('site-title', config.name);
   setText('footer-name', config.name);
-  setText('tagline', config.tagline);
-  setText('intro', config.intro);
   setText('about-description', config.about);
   document.querySelectorAll('[data-profile-name]').forEach(node => { node.textContent = config.name || 'HULAB'; });
   document.getElementById('year').textContent = new Date().getFullYear();
   if (config.name) document.title = `${config.name} · 个人空间`;
-  if (config.intro) {
-    document.querySelector('meta[name="description"]').content = `${config.name} 的个人空间。${config.intro}`;
-    document.querySelector('meta[property="og:description"]').content = config.intro;
-  }
   document.querySelector('meta[property="og:title"]').content = document.title;
   function setLink(selector, value) {
     try {
@@ -27,16 +21,13 @@
 
   const canvas = document.getElementById('fluid-background');
   const hint = document.getElementById('interaction-hint');
-  const toggle = document.getElementById('motion-toggle');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let engine;
   let unavailable = false;
-  let userPaused = false;
   let introPlayed = false;
   let introTimer;
   const activePointers = new Set();
-  try { userPaused = localStorage.getItem('fluid-paused') === 'true'; } catch { /* Storage is optional. */ }
-  const stopped = () => userPaused || motion.matches || document.hidden || Boolean(document.querySelector('dialog[open]'));
+  const stopped = () => motion.matches || document.hidden || Boolean(document.querySelector('dialog[open]'));
   function stopIntro() { clearTimeout(introTimer); introTimer = undefined; }
   function releasePointers() {
     activePointers.forEach(id => { engine?.end(id); if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id); });
@@ -66,18 +57,10 @@
     }
     engine?.setPaused(pause);
     document.body.classList.toggle('motion-paused', pause);
-    toggle.hidden = unavailable || motion.matches;
-    toggle.textContent = userPaused ? '开启光效' : '暂停光效';
-    toggle.setAttribute('aria-pressed', String(userPaused));
     hint.hidden = pause || unavailable;
     if (pause) { stopIntro(); releasePointers(); }
     else openingColors();
   }
-  toggle.addEventListener('click', () => {
-    userPaused = !userPaused;
-    try { localStorage.setItem('fluid-paused', String(userPaused)); } catch { /* Storage is optional. */ }
-    updateMotion();
-  });
   document.querySelectorAll('[data-dialog]').forEach(link => {
     link.addEventListener('click', event => {
       if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
@@ -132,7 +115,6 @@
     canvas.hidden = true;
     canvas.dataset.renderer = 'unavailable';
     hint.hidden = true;
-    toggle.hidden = true;
   });
   canvas.addEventListener('webglcontextrestored', () => { unavailable = false; canvas.hidden = false; updateMotion(); });
   updateMotion();
