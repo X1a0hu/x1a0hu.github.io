@@ -25,8 +25,9 @@ jobs:
       - name: Prepare static files
         run: |
           mkdir _site
-          cp index.html notes.html about.html 404.html styles.css app.js site.config.js favicon.svg .nojekyll THIRD_PARTY_NOTICES.md _site/
+          cp index.html gallery.html notes.html about.html 404.html styles.css gallery.css app.js gallery.js site.config.js gallery.config.js favicon.svg .nojekyll THIRD_PARTY_NOTICES.md _site/
           cp -R vendor _site/vendor
+          cp -R photos _site/photos
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
