@@ -1,17 +1,18 @@
 # HULAB · 个人空间
 
-参考 Gx404 的一屏式个人主页：深色背景、渐变标题、WebGL 流体动画和四个导航入口。
+参考 Gx404 的一屏式个人主页，包含 WebGL 流体动画，以及 GitHub、项目、画廊、书影音、笔记和关于入口。
 
 ## 文件
 
 - `index.html`：首页，以及笔记和关于弹窗。
+- `shelf.html`、`shelf.css`、`shelf.js`：书影音的页面、样式和交互。在 `shelf.config.js` 的对应分类中追加作品，即可记录读过的书、看过的影视和听过的音乐。
 - `site.config.js`：名字、简介和 GitHub 地址。
 - `styles.css`：桌面和手机布局。
 - `app.js`：弹窗、动画控制、配置和无障碍交互。
 - `vendor/fluid.js`：含 MIT 许可证的 WebGL 流体渲染器。
 - `notes.html`、`about.html`：支持直接打开、禁用 JavaScript 时仍可访问的页面。
 
-不需要安装依赖或构建。所有渲染资源都在本站内，没有字体 CDN、统计脚本和后端接口。
+本站为静态页面，可直接预览。字体使用 Google Fonts，书影音支持外部封面图片。
 
 ## 本地查看
 
