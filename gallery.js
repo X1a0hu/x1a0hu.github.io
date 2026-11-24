@@ -13,19 +13,20 @@
   const siteName = siteConfig.name || 'HULAB';
   setText('footer-name', siteName);
   setText('year', String(new Date().getFullYear()));
-  setText('gallery-eyebrow', galleryConfig.eyebrow);
-  setText('gallery-title', galleryConfig.title);
-  const titlePeriod = document.createElement('span');
-  titlePeriod.className = 'title-period';
-  titlePeriod.setAttribute('aria-hidden', 'true');
-  titlePeriod.textContent = '.';
-  document.getElementById('gallery-title')?.appendChild(titlePeriod);
+  setText('gallery-title', galleryConfig.title || '浮光');
   setText('gallery-subtitle', galleryConfig.subtitle);
   document.title = `${galleryConfig.title || '画廊'} · ${siteName}`;
 
   const months = [...new Set(items.map(item => String(item.date || '').match(/^\d{4}\.\d{2}/)?.[0]).filter(Boolean))].sort();
-  const dateRange = months.length > 1 ? `${months[0]} — ${months[months.length - 1]}` : months[0];
-  setText('archive-range', [dateRange, `${String(items.length).padStart(2, '0')} MOMENTS`].filter(Boolean).join('   /   '));
+  const dateRange = months.length > 1 ? `${months[0]} – ${months[months.length - 1]}` : months[0];
+  const totalPhotos = items.reduce((sum, item) => {
+    const len = Array.isArray(item.images) && item.images.length > 0 ? item.images.length : (item.image ? 1 : 0);
+    return sum + len;
+  }, 0);
+  const countSummary = totalPhotos > items.length
+    ? `${items.length} 组影像（共 ${totalPhotos} 张）`
+    : `${items.length} 组影像`;
+  setText('archive-range', [dateRange, countSummary].filter(Boolean).join(' · '));
 
   const nowCard = document.getElementById('now-card');
   const nowStatus = galleryConfig.nowStatus;
@@ -45,6 +46,7 @@
   const filterBarEl = document.getElementById('filter-bar');
   const countEl = document.getElementById('gallery-count');
 
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let activeFilter = 'all';
   let filteredItems = [...items];
   let activeLightboxIndex = 0;
@@ -54,22 +56,28 @@
   let filmAutoRaf = 0;
   let filmLastTime = 0;
   let suppressClickUntil = 0;
-  const FILM_SPEED_PX_PER_SEC = 56;
+  let filmHovered = false;
+  let filmFocused = false;
+  const FILM_SPEED_PX_PER_SEC = 42;
 
   const isLiveItem = item => Boolean(item?.liveVideo);
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const getItemImages = item => {
-    if (Array.isArray(item.images) && item.images.length > 0) return item.images;
-    return item.image ? [item.image] : [];
+    if (Array.isArray(item?.images) && item.images.length > 0) return item.images;
+    return item?.image ? [item.image] : [];
   };
-
   const formatIsoDate = raw => String(raw || '').split(' · ')[0].replace(/\./g, '-');
-
-  const isFilmView = () => true;
   const canLoopFilm = () => filteredItems.length > 1;
+  const shouldAutoScroll = () => (
+    canLoopFilm() &&
+    !reducedMotion.matches &&
+    !filmHovered &&
+    !filmFocused &&
+    !document.hidden &&
+    !dialog?.open
+  );
 
   function getFilmMetrics() {
-    const firstCard = gridEl.querySelector('.photo-card');
+    const firstCard = gridEl?.querySelector('.photo-card');
     if (!firstCard || !canLoopFilm()) return null;
     const frameWidth = firstCard.getBoundingClientRect().width;
     if (!frameWidth) return null;
@@ -81,7 +89,7 @@
 
   function normalizeFilmScroll() {
     const metrics = getFilmMetrics();
-    if (!metrics) return;
+    if (!metrics || !gridEl) return;
     const { setWidth } = metrics;
     let delta = 0;
     if (filmScrollPos < setWidth * 0.5) {
@@ -97,7 +105,7 @@
   }
 
   function tickFilmAutoScroll(now) {
-    if (!canLoopFilm() || document.hidden || dialog?.open) {
+    if (!shouldAutoScroll()) {
       filmAutoRaf = 0;
       filmLastTime = 0;
       return;
@@ -106,7 +114,7 @@
     const dt = Math.min(64, now - filmLastTime);
     filmLastTime = now;
 
-    if (!filmDrag) {
+    if (!filmDrag && gridEl) {
       filmScrollPos += (FILM_SPEED_PX_PER_SEC * dt) / 1000;
       gridEl.scrollLeft = filmScrollPos;
       normalizeFilmScroll();
@@ -115,7 +123,7 @@
   }
 
   function syncFilmAutoScroll() {
-    if (canLoopFilm() && !document.hidden && !dialog?.open) {
+    if (shouldAutoScroll()) {
       if (!filmAutoRaf) {
         filmLastTime = 0;
         filmAutoRaf = requestAnimationFrame(tickFilmAutoScroll);
@@ -127,8 +135,31 @@
     }
   }
 
-  gridEl.addEventListener('scroll', () => {
-    if (!isFilmView()) return;
+  reducedMotion.addEventListener('change', syncFilmAutoScroll);
+
+  gridEl?.addEventListener('pointerenter', () => {
+    filmHovered = true;
+    syncFilmAutoScroll();
+  });
+
+  gridEl?.addEventListener('pointerleave', () => {
+    filmHovered = false;
+    syncFilmAutoScroll();
+  });
+
+  gridEl?.addEventListener('focusin', () => {
+    filmFocused = true;
+    syncFilmAutoScroll();
+  });
+
+  gridEl?.addEventListener('focusout', event => {
+    if (!gridEl.contains(event.relatedTarget)) {
+      filmFocused = false;
+      syncFilmAutoScroll();
+    }
+  });
+
+  gridEl?.addEventListener('scroll', () => {
     if (!filmDrag && Math.abs(gridEl.scrollLeft - filmScrollPos) > 2) {
       filmScrollPos = gridEl.scrollLeft;
     }
@@ -136,11 +167,11 @@
   }, { passive: true });
 
   window.addEventListener('resize', () => {
-    if (isFilmView()) normalizeFilmScroll();
+    normalizeFilmScroll();
   }, { passive: true });
 
-  gridEl.addEventListener('wheel', event => {
-    if (!isFilmView() || event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+  gridEl?.addEventListener('wheel', event => {
+    if (event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
     const scale = event.deltaMode === 1 ? 20 : event.deltaMode === 2 ? gridEl.clientWidth : 1;
     const delta = event.deltaY * scale;
     if (!canLoopFilm()) {
@@ -153,14 +184,14 @@
     normalizeFilmScroll();
   }, { passive: false });
 
-  gridEl.addEventListener('pointerdown', event => {
-    if (!isFilmView() || event.pointerType !== 'mouse' || event.button !== 0) return;
+  gridEl?.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
     normalizeFilmScroll();
     filmDrag = { pointerId: event.pointerId, startX: event.clientX, startScroll: filmScrollPos, moved: false };
   });
 
   window.addEventListener('pointermove', event => {
-    if (!filmDrag || event.pointerId !== filmDrag.pointerId) return;
+    if (!filmDrag || event.pointerId !== filmDrag.pointerId || !gridEl) return;
     const distance = event.clientX - filmDrag.startX;
     if (!filmDrag.moved && Math.abs(distance) < 6) return;
     if (!filmDrag.moved) {
@@ -175,7 +206,7 @@
   }, { passive: false });
 
   function endFilmDrag() {
-    if (!filmDrag) return;
+    if (!filmDrag || !gridEl) return;
     const { pointerId, moved } = filmDrag;
     filmDrag = null;
     if (moved) suppressClickUntil = performance.now() + 250;
@@ -187,14 +218,14 @@
   window.addEventListener('pointerup', endFilmDrag);
   window.addEventListener('pointercancel', endFilmDrag);
   window.addEventListener('blur', endFilmDrag);
-  gridEl.addEventListener('lostpointercapture', endFilmDrag);
-  gridEl.addEventListener('click', event => {
+  gridEl?.addEventListener('lostpointercapture', endFilmDrag);
+  gridEl?.addEventListener('click', event => {
     if (performance.now() < suppressClickUntil) {
       event.preventDefault();
       event.stopPropagation();
     }
   }, true);
-  gridEl.addEventListener('dragstart', event => {
+  gridEl?.addEventListener('dragstart', event => {
     event.preventDefault();
   });
 
@@ -205,7 +236,7 @@
     const filters = [{ key: 'all', label: '全部', count: items.length }];
     const liveCount = items.filter(isLiveItem).length;
     if (liveCount > 0) {
-      filters.push({ key: '__live__', label: 'LIVE', count: liveCount });
+      filters.push({ key: '__live__', label: '实况视频', count: liveCount });
     }
 
     const tagCounts = new Map();
@@ -270,10 +301,49 @@
     card.setAttribute('aria-label', `查看照片：${item.title || '未命名'}`);
     card.setAttribute('aria-haspopup', 'dialog');
 
+    const imgs = getItemImages(item);
+
+    // 胶片边缘暗房印码：琥珀色真实帧号 + 分类 / 多图 / 实况标记
+    const rebate = document.createElement('div');
+    rebate.className = 'card-rebate';
+
+    const frameCode = document.createElement('span');
+    frameCode.className = 'rebate-code';
+    const frameNo = String(items.indexOf(item) + 1).padStart(2, '0');
+    frameCode.textContent = `${frameNo}A`;
+
+    const flags = document.createElement('div');
+    flags.className = 'rebate-flags';
+
+    if (isLiveItem(item)) {
+      const liveFlag = document.createElement('span');
+      liveFlag.className = 'rebate-flag is-live';
+      const dot = document.createElement('span');
+      dot.className = 'rebate-flag-dot';
+      dot.setAttribute('aria-hidden', 'true');
+      liveFlag.append(dot, document.createTextNode('实况'));
+      flags.appendChild(liveFlag);
+    }
+
+    if (imgs.length > 1) {
+      const multiFlag = document.createElement('span');
+      multiFlag.className = 'rebate-flag';
+      multiFlag.textContent = `${imgs.length} 张`;
+      flags.appendChild(multiFlag);
+    }
+
+    if (item.tag) {
+      const tagFlag = document.createElement('span');
+      tagFlag.className = 'rebate-stock';
+      tagFlag.textContent = item.tag;
+      flags.appendChild(tagFlag);
+    }
+
+    rebate.append(frameCode, flags);
+
     const media = document.createElement('div');
     media.className = 'card-media';
 
-    const imgs = getItemImages(item);
     const img = document.createElement('img');
     img.className = 'card-img';
     img.src = imgs[0] || '';
@@ -298,16 +368,16 @@
     const body = document.createElement('div');
     body.className = 'card-body';
 
+    const titleEl = document.createElement('h2');
+    titleEl.className = 'card-title';
+    titleEl.textContent = item.title || '未命名影像';
+
     const metaLine = document.createElement('p');
     metaLine.className = 'card-meta-line';
-    const frameNo = String(items.indexOf(item) + 1).padStart(2, '0');
-    const parts = isFilmView()
-      ? [frameNo, formatIsoDate(item.date), item.location, item.tag].filter(Boolean)
-      : [formatIsoDate(item.date), item.location, item.tag].filter(Boolean);
-    metaLine.textContent = parts.join(' · ');
-    body.appendChild(metaLine);
+    metaLine.textContent = [formatIsoDate(item.date), item.location].filter(Boolean).join(' · ');
 
-    card.append(media, body);
+    body.append(titleEl, metaLine);
+    card.append(rebate, media, body);
 
     if (isLiveItem(item)) {
       card.addEventListener('pointerenter', () => startCardLive(card, videoEl));
@@ -317,17 +387,17 @@
 
     card.addEventListener('click', () => openLightbox(index));
     card.addEventListener('keydown', event => {
-      if (isFilmView() && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
         event.preventDefault();
         const delta = event.key === 'ArrowRight' ? 1 : -1;
         const nextIndex = (index + delta + filteredItems.length) % filteredItems.length;
         const metrics = getFilmMetrics();
-        if (metrics) {
+        if (metrics && gridEl) {
           filmScrollPos += delta * metrics.frameWidth;
           gridEl.scrollLeft = filmScrollPos;
           normalizeFilmScroll();
         }
-        const primaryTarget = gridEl.querySelector(`.photo-card[data-copy-index="${primaryCopyIdx}"][data-item-index="${nextIndex}"]`);
+        const primaryTarget = gridEl?.querySelector(`.photo-card[data-copy-index="${primaryCopyIdx}"][data-item-index="${nextIndex}"]`);
         primaryTarget?.focus({ preventScroll: true });
       } else if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
@@ -352,28 +422,24 @@
     });
 
     if (countEl) {
-      countEl.textContent = `共 ${filteredItems.length} 条记录`;
+      countEl.textContent = `共 ${filteredItems.length} 组影像`;
     }
 
     if (filteredItems.length === 0) {
+      gridEl.classList.remove('is-single');
       delete gridEl.dataset.repeatsPerSet;
       filmScrollPos = 0;
       gridEl.scrollLeft = 0;
       syncFilmAutoScroll();
-      const empty = document.createElement('div');
+      const empty = document.createElement('p');
       empty.className = 'empty-note';
-      const star = document.createElement('span');
-      star.className = 'small-star';
-      star.setAttribute('aria-hidden', 'true');
-      star.textContent = '✳';
-      const p = document.createElement('p');
-      p.textContent = '当前分类下还没有实况或照片记录。';
-      empty.append(star, p);
+      empty.textContent = '当前分类下还没有影像记录。';
       gridEl.appendChild(empty);
       return;
     }
 
     if (canLoopFilm()) {
+      gridEl.classList.remove('is-single');
       const repeatsPerSet = Math.max(1, Math.ceil(4 / filteredItems.length));
       gridEl.dataset.repeatsPerSet = String(repeatsPerSet);
       const totalCopies = 3 * repeatsPerSet;
@@ -392,6 +458,7 @@
       return;
     }
 
+    gridEl.classList.add('is-single');
     delete gridEl.dataset.repeatsPerSet;
     filteredItems.forEach((item, index) => {
       gridEl.appendChild(buildPhotoCard(item, index, 0, 0));
@@ -401,7 +468,7 @@
     syncFilmAutoScroll();
   }
 
-  // 全屏沉浸式 Lightbox 逻辑
+  // 全屏暗房灯箱（支持同组多图切换与实况视频播放）
   const dialog = document.getElementById('lightbox-dialog');
   const closeBtn = document.getElementById('lightbox-close');
   const prevBtn = document.getElementById('lightbox-prev');
@@ -409,10 +476,24 @@
   const mediaWrap = document.getElementById('lightbox-media-wrap');
   const lightboxImg = document.getElementById('lightbox-img');
   const lightboxVideo = document.getElementById('lightbox-video');
+  const lightboxLiveBtn = document.getElementById('lightbox-live-btn');
+  const lightboxSubcount = document.getElementById('lightbox-subcount');
+  const lightboxThumbs = document.getElementById('lightbox-thumbs');
+  const lightboxDateWrap = document.getElementById('lightbox-date-wrap');
+  const lightboxLocationWrap = document.getElementById('lightbox-location-wrap');
+  const lightboxExifWrap = document.getElementById('lightbox-exif-wrap');
+
+  let lightboxLivePlaying = false;
 
   function setLightboxLivePlaying(playing) {
-    if (!mediaWrap) return;
-    mediaWrap.classList.toggle('is-live-playing', playing);
+    lightboxLivePlaying = playing;
+    if (mediaWrap) {
+      mediaWrap.classList.toggle('is-live-playing', playing);
+    }
+    if (lightboxLiveBtn) {
+      lightboxLiveBtn.classList.toggle('is-active', playing);
+      lightboxLiveBtn.setAttribute('aria-pressed', String(playing));
+    }
     if (lightboxVideo && !lightboxVideo.hidden) {
       if (playing) {
         lightboxVideo.currentTime = 0;
@@ -423,11 +504,46 @@
     }
   }
 
+  function renderLightboxThumbs(item, imgs) {
+    if (!lightboxThumbs) return;
+    lightboxThumbs.textContent = '';
+    if (imgs.length <= 1) {
+      lightboxThumbs.hidden = true;
+      return;
+    }
+
+    lightboxThumbs.hidden = false;
+    imgs.forEach((src, subIdx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `thumb-btn${subIdx === activeSubImageIndex ? ' is-active' : ''}`;
+      btn.setAttribute('aria-label', `查看「${item.title || '当前影像'}」第 ${subIdx + 1} 张`);
+      if (subIdx === activeSubImageIndex) {
+        btn.setAttribute('aria-current', 'true');
+      }
+
+      const thumbImg = document.createElement('img');
+      thumbImg.src = src;
+      thumbImg.alt = '';
+      thumbImg.loading = 'eager';
+      btn.appendChild(thumbImg);
+
+      btn.addEventListener('click', () => {
+        if (activeSubImageIndex === subIdx) return;
+        activeSubImageIndex = subIdx;
+        updateLightboxContent();
+      });
+
+      lightboxThumbs.appendChild(btn);
+    });
+  }
+
   function updateLightboxContent() {
     const item = filteredItems[activeLightboxIndex];
     if (!item) return;
 
     const imgs = getItemImages(item);
+    if (activeSubImageIndex >= imgs.length) activeSubImageIndex = 0;
     const currentSrc = imgs[activeSubImageIndex] || imgs[0] || '';
 
     setLightboxLivePlaying(false);
@@ -437,8 +553,9 @@
       lightboxImg.alt = item.title || '大图预览';
     }
 
+    const hasLiveHere = Boolean(item.liveVideo) && activeSubImageIndex === 0;
     if (lightboxVideo) {
-      if (item.liveVideo && activeSubImageIndex === 0) {
+      if (hasLiveHere) {
         lightboxVideo.src = item.liveVideo;
         lightboxVideo.hidden = false;
       } else {
@@ -447,21 +564,38 @@
         lightboxVideo.hidden = true;
       }
     }
+    if (lightboxLiveBtn) {
+      lightboxLiveBtn.hidden = !hasLiveHere;
+    }
 
     const pad = n => String(n).padStart(2, '0');
-    const summaryParts = [
-      `${pad(activeLightboxIndex + 1)} / ${pad(filteredItems.length)}`,
-      formatIsoDate(item.date),
-      item.location,
-      item.tag,
-      item.meta,
-    ].filter(Boolean);
+    setText('lightbox-index', `${pad(activeLightboxIndex + 1)} / ${pad(filteredItems.length)}`);
 
-    setText('lightbox-index', summaryParts.join(' · '));
-    setText('lightbox-tag', '');
-    setText('lightbox-date', '');
-    setText('lightbox-title', item.title ? `· ${item.title}` : '');
-    setText('lightbox-note', item.note ? `— ${item.note}` : '');
+    if (lightboxSubcount) {
+      if (imgs.length > 1) {
+        lightboxSubcount.hidden = false;
+        lightboxSubcount.textContent = `第 ${activeSubImageIndex + 1} / ${imgs.length} 张`;
+      } else {
+        lightboxSubcount.hidden = true;
+      }
+    }
+
+    setText('lightbox-title', item.title || '未命名影像');
+    setText('lightbox-note', item.note || '');
+
+    const dateText = formatIsoDate(item.date);
+    setText('lightbox-date', dateText);
+    if (lightboxDateWrap) lightboxDateWrap.hidden = !dateText;
+
+    const locText = [item.location, item.tag].filter(Boolean).join(' · ');
+    setText('lightbox-location', locText);
+    if (lightboxLocationWrap) lightboxLocationWrap.hidden = !locText;
+
+    const exifText = item.meta || '';
+    setText('lightbox-exif', exifText);
+    if (lightboxExifWrap) lightboxExifWrap.hidden = !exifText;
+
+    renderLightboxThumbs(item, imgs);
 
     if (prevBtn) prevBtn.disabled = filteredItems.length < 2;
     if (nextBtn) nextBtn.disabled = filteredItems.length < 2;
@@ -469,7 +603,7 @@
 
   function openLightbox(index) {
     if (!dialog?.showModal || !filteredItems[index]) return;
-    gridEl.querySelectorAll('.photo-card').forEach(card => stopCardLive(card, card.querySelector('video')));
+    gridEl?.querySelectorAll('.photo-card').forEach(card => stopCardLive(card, card.querySelector('video')));
     activeLightboxIndex = index;
     activeSubImageIndex = 0;
     updateLightboxContent();
@@ -484,24 +618,35 @@
     updateLightboxContent();
   }
 
+  function stepSubImage(delta) {
+    const item = filteredItems[activeLightboxIndex];
+    const imgs = getItemImages(item);
+    if (imgs.length <= 1) return;
+    activeSubImageIndex = (activeSubImageIndex + delta + imgs.length) % imgs.length;
+    updateLightboxContent();
+  }
+
   prevBtn?.addEventListener('click', () => stepLightbox(-1));
   nextBtn?.addEventListener('click', () => stepLightbox(1));
   closeBtn?.addEventListener('click', () => dialog?.close());
+  lightboxLiveBtn?.addEventListener('click', () => {
+    setLightboxLivePlaying(!lightboxLivePlaying);
+  });
 
   dialog?.addEventListener('close', () => {
     setLightboxLivePlaying(false);
     syncFilmAutoScroll();
-    const primaryCopyIdx = Number(gridEl.dataset.repeatsPerSet || 0);
+    const primaryCopyIdx = Number(gridEl?.dataset.repeatsPerSet || 0);
     const activeCard =
-      gridEl.querySelector(`.photo-card[data-copy-index="${primaryCopyIdx}"][data-item-index="${activeLightboxIndex}"]`) ||
-      gridEl.querySelector(`.photo-card[data-item-index="${activeLightboxIndex}"]`);
+      gridEl?.querySelector(`.photo-card[data-copy-index="${primaryCopyIdx}"][data-item-index="${activeLightboxIndex}"]`) ||
+      gridEl?.querySelector(`.photo-card[data-item-index="${activeLightboxIndex}"]`);
     activeCard?.focus({ preventScroll: true });
   });
 
   document.addEventListener('visibilitychange', () => {
     syncFilmAutoScroll();
     if (!document.hidden) return;
-    gridEl.querySelectorAll('.photo-card').forEach(card => stopCardLive(card, card.querySelector('video')));
+    gridEl?.querySelectorAll('.photo-card').forEach(card => stopCardLive(card, card.querySelector('video')));
     setLightboxLivePlaying(false);
   });
 
@@ -519,6 +664,12 @@
     } else if (event.key === 'ArrowRight') {
       event.preventDefault();
       stepLightbox(1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      stepSubImage(-1);
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      stepSubImage(1);
     }
   });
 

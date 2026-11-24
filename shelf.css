@@ -101,6 +101,18 @@ button {
   display: none !important;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* 顶部 #tfyi-bar 工具条 */
 #tfyi-bar {
   position: fixed;
@@ -146,34 +158,9 @@ button {
 .shelf-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
-  min-height: 76px;
-  padding: 10px 0 8px;
-}
-
-.shelf-header h1 {
-  margin: 0;
-  font-size: clamp(28px, 5.4vw, 54px);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -.045em;
-  white-space: nowrap;
-}
-
-.shelf-header h1 a {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.long {
-  display: inline-block;
-  padding: 2px 14px 4px;
-  border-radius: 12px;
-  background: var(--accent);
-  color: #131311;
-  box-shadow: 0 2px 0 rgba(19, 19, 17, .08);
+  padding: 14px 0 10px;
 }
 
 .live {
@@ -684,41 +671,6 @@ button {
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* 序号角标（当 # 开关打开时显示） */
-.rank-badge {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  min-width: 18px;
-  height: 16px;
-  padding: 0 4px;
-  border-radius: 4px;
-  background: rgba(19, 19, 17, .82);
-  color: #ffffff;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 16px;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none;
-}
-
-.hide-numbers .rank-badge {
-  display: none !important;
-}
-
-.hide-numbers .spine-inner {
-  padding-top: 10px;
-}
-
-.hide-titles .grid-meta,
-.hide-titles .jacket-caption {
-  display: none !important;
-}
-
 /* 展开在侧脊旁的真实专辑封面页 / 唱片正面封套（复刻 taylor.fyi CD + Cover 联动效果） */
 .active-jacket {
   position: relative;
@@ -1043,14 +995,6 @@ button {
   padding-top: 2px;
 }
 
-.spine-cd .rank-badge {
-  top: 10px;
-  min-width: 15px;
-  height: 14px;
-  font-size: 8px;
-  line-height: 14px;
-}
-
 /* 字体个性变化（让每张专辑侧脊有独立的平面设计气质） */
 .typo-serif .cd-title,
 .typo-serif .tape-artist,
@@ -1158,10 +1102,6 @@ button {
   object-fit: cover;
 }
 
-.spine-tape .rank-badge {
-  top: 10px;
-}
-
 /* 3. VHS 复古录像带纸套正面卡 (.art-wrap.is-vhs) */
 .art-wrap.is-vhs {
   aspect-ratio: 2 / 3;
@@ -1224,20 +1164,8 @@ button {
   place-items: center;
 }
 
-.spine-dvd .rank-badge {
-  top: 24px;
-  min-width: 15px;
-  height: 14px;
-  font-size: 8px;
-  line-height: 14px;
-}
-
 .spine-dvd .spine-inner {
-  padding: 42px 2px 10px;
-}
-
-.hide-numbers .spine-dvd .spine-inner {
-  padding-top: 26px;
+  padding: 26px 2px 10px;
 }
 
 /* 5. 书籍侧脊 (.spine-book)：布面精装高矮宽窄错落书架 */
@@ -1261,7 +1189,7 @@ button {
   z-index: 1;
   width: 100%;
   height: 100%;
-  padding: 26px 3px 10px;
+  padding: 10px 3px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1397,12 +1325,6 @@ button {
   height: 100%;
   display: block;
   object-fit: cover;
-}
-
-.grid-card .rank-badge {
-  top: 8px;
-  left: 8px;
-  transform: none;
 }
 
 .grid-meta {

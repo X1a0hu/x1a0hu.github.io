@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f3f2ed" id="meta-theme-color" />
+    <meta name="theme-color" content="#000000" id="meta-theme-color" />
     <meta name="description" content="HULAB 的书影音，记录读过的书、看过的电影和剧、听过的专辑和歌。" />
     <meta property="og:title" content="书影音 · HULAB" />
     <meta property="og:description" content="读过的书，看过的电影和剧，听过的专辑和歌。" />
@@ -13,10 +13,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&family=Space+Grotesk:wght@500;700&display=swap" />
-    <link rel="stylesheet" href="./shelf.css" />
+    <link rel="stylesheet" href="./shelf.css?v=hulab-4" />
     <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./shelf.config.js"></script>
-    <script defer src="./shelf.js"></script>
+    <script defer src="./shelf.config.js?v=hulab-2"></script>
+    <script defer src="./shelf.js?v=hulab-3"></script>
   </head>
   <body>
     <div id="tfyi-bar">
@@ -28,11 +28,7 @@
 
     <div class="wrap">
       <header class="shelf-header">
-        <h1>
-          <a href="./shelf.html">
-            <span class="long" id="shelf-title">书影音</span>
-          </a>
-        </h1>
+        <h1 class="sr-only" id="shelf-title">书影音</h1>
         <div class="live" aria-label="馆藏作品总数">
           <canvas id="globe" width="88" height="88" aria-hidden="true"></canvas>
           <div class="live-meta">
@@ -68,15 +64,7 @@
                     <span class="opt-label">封面</span>
                     <span class="opt-track"><span class="opt-thumb"></span></span>
                   </button>
-                  <button type="button" class="opt-toggle is-on" id="toggle-titles" aria-pressed="true" title="显示/隐藏封面下方标题栏">
-                    <span class="opt-label">Aa</span>
-                    <span class="opt-track"><span class="opt-thumb"></span></span>
-                  </button>
-                  <button type="button" class="opt-toggle" id="toggle-numbers" aria-pressed="false" title="显示/隐藏序号">
-                    <span class="opt-label">#</span>
-                    <span class="opt-track"><span class="opt-thumb"></span></span>
-                  </button>
-                  <button type="button" class="opt-toggle" id="toggle-theme" aria-pressed="false" title="切换亮色/暗色主题">
+                  <button type="button" class="opt-toggle is-on" id="toggle-theme" aria-pressed="true" title="切换暗色/亮色主题">
                     <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
                     <span class="opt-track"><span class="opt-thumb"></span></span>
                   </button>

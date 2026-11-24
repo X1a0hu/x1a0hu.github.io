@@ -13,7 +13,7 @@ window.SHELF_CONFIG = Object.freeze({
   title: '书影音',
   handle: '@X1a0hu',
   defaultCategory: 'albums',
-  defaultTheme: 'light', // 'light'（原版暖白）或 'dark'（纯黑暗房）
+  defaultTheme: 'dark', // 'dark'（纯黑暗房）或 'light'（原版暖白）
 
   categories: {
     albums: {
@@ -64,7 +64,7 @@ window.SHELF_CONFIG = Object.freeze({
         { title: 'Let It Happen', creator: 'Tame Impala', year: '2015', era: '2026', color: '#3b1c54', accent: '#f43f5e', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a8/2e/b4/a82eb490-f30a-a321-461a-0383c88fec95/15UMGIM23316.rgb.jpg/600x600bb.jpg', rating: '9.7', note: '七分多钟的迷幻旅程，中段卡碟循环的处理神来之笔。' },
         { title: '以父之名', creator: '周杰伦', year: '2003', era: '2026', color: '#451a1c', accent: '#d4af37', cover: 'https://upload.wikimedia.org/wikipedia/en/3/30/Yehuimei.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.9', note: '歌剧女高音与古典弦乐切入嘻哈节拍的经典时刻。' },
         { title: 'Midnight City', creator: 'M83', year: '2011', era: '2026', color: '#1e1b4b', accent: '#ec4899', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/73/c6/ed/73c6edb3-924c-27f0-28f8-1470906d6780/cover.jpg/600x600bb.jpg', rating: '9.6', note: '夜晚开车或写代码时的最佳背景音，尾段萨克斯封神。' },
-        { title: ' Ribs', creator: 'Lorde', year: '2013', era: '2026', color: '#172554', accent: '#93c5fd', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/96/a5/09/96a50916-169b-724c-b722-b8c474406352/13UAAIM68691.rgb.jpg/600x600bb.jpg', rating: '9.5', note: '渐强的环境音墙把成长的焦虑与怀念推向顶点。' },
+        { title: 'Ribs', creator: 'Lorde', year: '2013', era: '2026', color: '#172554', accent: '#93c5fd', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/96/a5/09/96a50916-169b-724c-b722-b8c474406352/13UAAIM68691.rgb.jpg/600x600bb.jpg', rating: '9.5', note: '渐强的环境音墙把成长的焦虑与怀念推向顶点。' },
         { title: 'Space Song', creator: 'Beach House', year: '2015', era: '2026', color: '#31102f', accent: '#fbcfe8', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/09/e0/d5/09e0d559-0682-f0f0-5e0c-3cd11e3114fd/beachhouse_depressioncherry_2400_300.jpg/600x600bb.jpg', rating: '9.6', note: '滑棒吉他一响就像漂浮在失重的星云里。' },
         { title: '晴天', creator: '周杰伦', year: '2003', era: '2026', color: '#1e3a5f', accent: '#bae6fd', cover: 'https://upload.wikimedia.org/wikipedia/en/3/30/Yehuimei.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.8', note: '前奏的木吉他拨弦是多少人的青春开场白。' },
         { title: '采石', creator: '万能青年旅店', year: '2020', era: 'all', color: '#273832', accent: '#a7f3d0', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/c5/bd/a6/c5bda6ad-0ed6-849d-dc07-c6b527c0b5aa/cover.jpg/600x600bb.jpg', rating: '9.7', note: '自由爵士与摇滚乐的铿锵对话。' },

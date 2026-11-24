@@ -5,6 +5,7 @@
 ## 文件
 
 - `index.html`：首页，以及笔记和关于弹窗。
+- `gallery.html`、`gallery.css`、`gallery.js`、`gallery.config.js`：画廊「浮光」的暗房 35mm 胶卷与灯箱页面；照片放入 `photos/` 并在 `gallery.config.js` 中追加条目。
 - `shelf.html`、`shelf.css`、`shelf.js`：书影音的页面、样式和交互。在 `shelf.config.js` 的对应分类中追加作品，即可记录读过的书、看过的影视和听过的音乐。
 - `site.config.js`：名字、简介和 GitHub 地址。
 - `styles.css`：桌面和手机布局。

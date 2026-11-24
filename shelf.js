@@ -32,8 +32,6 @@
   let activeLook = categories[activeCategory]?.defaultLook || 'cds';
   let activeEra = 'all';
   let searchQuery = '';
-  let showNumbers = false;
-  let showTitles = true;
   let showJacket = false;
   let activeItemIndex = 0;
   let visibleItems = [];
@@ -118,7 +116,7 @@
     }
   });
 
-  // 顶部开关：封面展开、Aa 标题栏、# 序号
+  // 顶部开关：封面展开
   const mediaStage = document.getElementById('media-stage');
 
   const jacketBtn = document.getElementById('toggle-jacket');
@@ -127,22 +125,6 @@
     jacketBtn.classList.toggle('is-on', showJacket);
     jacketBtn.setAttribute('aria-pressed', String(showJacket));
     renderStage();
-  });
-
-  const titlesBtn = document.getElementById('toggle-titles');
-  titlesBtn?.addEventListener('click', () => {
-    showTitles = !showTitles;
-    titlesBtn.classList.toggle('is-on', showTitles);
-    titlesBtn.setAttribute('aria-pressed', String(showTitles));
-    mediaStage?.classList.toggle('hide-titles', !showTitles);
-  });
-
-  const numBtn = document.getElementById('toggle-numbers');
-  numBtn?.addEventListener('click', () => {
-    showNumbers = !showNumbers;
-    numBtn.classList.toggle('is-on', showNumbers);
-    numBtn.setAttribute('aria-pressed', String(showNumbers));
-    mediaStage?.classList.toggle('hide-numbers', !showNumbers);
   });
 
   // 兜底 Canvas 封面生成器（仅当离线或无封面时触发）
@@ -389,17 +371,10 @@
   }
 
   // 构建展开的正面专辑/影视/书籍封面页（.active-jacket）
-  function buildActiveJacket(item, index) {
+  function buildActiveJacket(item) {
     const isPoster = activeCategory === 'movies' || activeCategory === 'tv' || activeCategory === 'books';
     const wrap = document.createElement('div');
     wrap.className = `active-jacket${isPoster ? ' is-poster' : ''}`;
-
-    const badge = document.createElement('span');
-    badge.className = 'rank-badge';
-    badge.style.top = '8px';
-    badge.style.left = '8px';
-    badge.style.transform = 'none';
-    badge.textContent = String(index + 1);
 
     const img = createCoverImg(item, activeCategory, 'art-img', true);
 
@@ -413,7 +388,7 @@
     c.textContent = item.creator || '';
     cap.append(t, c);
 
-    wrap.append(badge, img, cap);
+    wrap.append(img, cap);
     return wrap;
   }
 
@@ -443,11 +418,6 @@
 
     const paperColor = item.color || '#1f2937';
     const paperInk = getSpineInk(paperColor);
-
-    const badge = document.createElement('span');
-    badge.className = 'rank-badge';
-    badge.textContent = String(index + 1);
-    btn.appendChild(badge);
 
     // 1. CD 晶透塑料壳 + 实色纸卡侧脊
     if (spineType === 'cd') {
@@ -586,8 +556,6 @@
   function renderStage() {
     if (!mediaStage) return;
     mediaStage.textContent = '';
-    mediaStage.classList.toggle('hide-numbers', !showNumbers);
-    mediaStage.classList.toggle('hide-titles', !showTitles);
 
     if (visibleItems.length === 0) {
       const empty = document.createElement('p');
@@ -670,13 +638,7 @@
         const thumbWrap = document.createElement('div');
         thumbWrap.className = 'player-thumb';
         const img = createCoverImg(item, activeCategory, 'art-img', idx < 6);
-        const badge = document.createElement('span');
-        badge.className = 'rank-badge';
-        badge.style.top = '4px';
-        badge.style.left = '4px';
-        badge.style.transform = 'none';
-        badge.textContent = String(idx + 1);
-        thumbWrap.append(img, badge);
+        thumbWrap.appendChild(img);
 
         const info = document.createElement('div');
         info.className = 'player-info';
@@ -729,11 +691,7 @@
       }
 
       const img = createCoverImg(item, activeCategory, 'art-img', idx < 8);
-      const badge = document.createElement('span');
-      badge.className = 'rank-badge';
-      if (isVhs) badge.style.top = '24px';
-      badge.textContent = String(idx + 1);
-      artWrap.append(img, badge);
+      artWrap.appendChild(img);
 
       if (activeLook === 'vinyl') {
         const sleeveWrap = document.createElement('div');
@@ -901,15 +859,6 @@
 
       ctx.fillStyle = 'rgba(255,255,255,0.18)';
       ctx.fillRect(x, y, 7, spineH);
-
-      if (showNumbers) {
-        ctx.fillStyle = 'rgba(0,0,0,0.75)';
-        ctx.fillRect(x + 12, y + 18, spineW - 24, 22);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '700 12px "JetBrains Mono", monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(String(i + 1), x + spineW / 2, y + 33);
-      }
 
       ctx.save();
       ctx.translate(x + spineW / 2, y + 58);
