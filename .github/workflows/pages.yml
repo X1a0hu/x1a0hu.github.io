@@ -25,6 +25,8 @@ jobs:
           cp index.html gallery.html shelf.html notes.html about.html 404.html styles.css gallery.css shelf.css app.js gallery.js shelf.js site.config.js gallery.config.js shelf.config.js favicon.svg .nojekyll THIRD_PARTY_NOTICES.md _site/
           cp -R vendor _site/vendor
           cp -R photos _site/photos
+          cp -R covers _site/covers
+          [ -d tickets ] && cp -R tickets _site/tickets || true
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -864,7 +864,7 @@
       [
         { k: 'DATE', v: item.date || item.year || '—' },
         { k: 'VENUE', v: item.venue || item.city || '—' },
-        { k: 'SEAT / PRICE', v: [item.seat, item.price].filter(Boolean).join(' · ') || 'GA' },
+        { k: item.price ? 'SEAT / PRICE' : 'SHOW / TYPE', v: [item.seat, item.price].filter(Boolean).join(' · ') || 'LIVE' },
       ].forEach(pair => {
         const cell = document.createElement('div');
         cell.className = 'ticket-meta-cell';
