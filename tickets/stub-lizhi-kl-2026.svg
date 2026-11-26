@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" width="960" height="340" role="img" aria-label="李志 2026.11.13 叁缺壹巡演吉隆坡站 纪念票根">
+  <defs>
+    <linearGradient id="seaBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#071d33"/>
+      <stop offset="48%" stop-color="#114068"/>
+      <stop offset="82%" stop-color="#226894"/>
+      <stop offset="100%" stop-color="#6fa5c4"/>
+    </linearGradient>
+    <radialGradient id="sunGlint" cx="0.72" cy="0.62" r="0.45">
+      <stop offset="0%" stop-color="#e8f6ff" stop-opacity="0.52"/>
+      <stop offset="45%" stop-color="#8ec7e6" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#071d33" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wakeGrad" x1="0.22" y1="0.82" x2="0.62" y2="0.34">
+      <stop offset="0%" stop-color="#d8f0ff" stop-opacity="0"/>
+      <stop offset="65%" stop-color="#d8f0ff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.68"/>
+    </linearGradient>
+    <linearGradient id="stubShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#051424"/>
+      <stop offset="100%" stop-color="#0a2540"/>
+    </linearGradient>
+    <mask id="ticketMask">
+      <rect x="0" y="0" width="960" height="340" rx="18" fill="#ffffff"/>
+      <circle cx="752" cy="0" r="16" fill="#000000"/>
+      <circle cx="752" cy="340" r="16" fill="#000000"/>
+      <circle cx="0" cy="170" r="10" fill="#000000"/>
+    </mask>
+  </defs>
+
+  <g mask="url(#ticketMask)">
+    <!-- 主票面深海背景 -->
+    <rect x="0" y="0" width="752" height="340" fill="url(#seaBg)"/>
+    <rect x="0" y="0" width="752" height="340" fill="url(#sunGlint)"/>
+
+    <!-- 海面细密波纹光影 -->
+    <g stroke="#d8f1ff" stroke-linecap="round" opacity="0.22">
+      <line x1="420" y1="224" x2="720" y2="224" stroke-width="1.2"/>
+      <line x1="470" y1="238" x2="734" y2="238" stroke-width="1.6"/>
+      <line x1="510" y1="252" x2="710" y2="252" stroke-width="1.2"/>
+      <line x1="455" y1="266" x2="740" y2="266" stroke-width="1.8"/>
+      <line x1="530" y1="280" x2="725" y2="280" stroke-width="1.4"/>
+      <line x1="490" y1="296" x2="736" y2="296" stroke-width="1.2"/>
+      <line x1="560" y1="312" x2="718" y2="312" stroke-width="1.6"/>
+    </g>
+
+    <!-- 纸飞机尾迹与纸飞机（致敬 2026 吉隆坡官方视觉） -->
+    <path d="M245 278 Q420 202 554 128" fill="none" stroke="url(#wakeGrad)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M275 268 Q432 200 554 128" fill="none" stroke="#ffffff" stroke-opacity="0.32" stroke-width="1.5" stroke-dasharray="4 5"/>
+    <g transform="translate(566 122) rotate(-14) scale(0.9)">
+      <polygon points="48,-24 -42,8 -10,16" fill="#f3f7fa"/>
+      <polygon points="48,-24 -10,16 -4,34" fill="#c7d8e6"/>
+      <polygon points="48,-24 -4,34 18,22" fill="#e6eef5"/>
+      <polygon points="-10,16 -4,34 5,20" fill="#8eaec7"/>
+    </g>
+
+    <!-- 细线装饰框 -->
+    <rect x="20" y="18" width="712" height="304" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1"/>
+
+    <!-- 顶部巡演眉标 -->
+    <text x="42" y="54" fill="#a8d4f0" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="600" letter-spacing="2.4">2026 THREE MISSING ONE TOUR · IN KUALA LUMPUR</text>
+    <rect x="614" y="38" width="96" height="22" rx="4" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.3"/>
+    <text x="662" y="53" text-anchor="middle" fill="#eef8ff" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" letter-spacing="1.4">LIVE PASS</text>
+
+    <!-- 主标题区域 -->
+    <text x="42" y="128" fill="#ffffff" font-family="'Noto Serif SC', 'Noto Sans SC', serif" font-size="52" font-weight="700" letter-spacing="4">叁缺壹</text>
+    <rect x="228" y="88" width="66" height="26" rx="4" fill="#e8f6ff" fill-opacity="0.16" stroke="#d5eeff" stroke-opacity="0.45"/>
+    <text x="261" y="106" text-anchor="middle" fill="#ffffff" font-family="'Noto Sans SC', sans-serif" font-size="13" font-weight="700" letter-spacing="2">李志</text>
+    <text x="228" y="132" fill="#cde6f7" font-family="'Space Grotesk', 'Noto Sans SC', sans-serif" font-size="16" font-weight="600" letter-spacing="1.5">吉隆坡站 · KUALA LUMPUR</text>
+
+    <!-- 分隔虚线 -->
+    <line x1="42" y1="214" x2="710" y2="214" stroke="#ffffff" stroke-opacity="0.24" stroke-dasharray="3 4"/>
+
+    <!-- 演出元数据三栏 -->
+    <g font-family="'JetBrains Mono', 'Noto Sans SC', monospace">
+      <text x="42" y="242" fill="#8dc0e0" font-size="10" letter-spacing="1.8">DATE &amp; TIME</text>
+      <text x="42" y="268" fill="#ffffff" font-size="17" font-weight="700">2026.11.13 FRI · 20:00</text>
+      <text x="42" y="294" fill="#b4d6ec" font-size="11">11.13 / 11.14 / 11.15 三场连演首夜</text>
+
+      <text x="310" y="242" fill="#8dc0e0" font-size="10" letter-spacing="1.8">VENUE</text>
+      <text x="310" y="268" fill="#ffffff" font-size="16" font-weight="700">IDEA LIVE ARENA</text>
+      <text x="310" y="294" fill="#b4d6ec" font-size="11">3 Damansara · Petaling Jaya, MY</text>
+
+      <text x="580" y="242" fill="#8dc0e0" font-size="10" letter-spacing="1.8">PLATFORM</text>
+      <text x="580" y="268" fill="#ffffff" font-size="15" font-weight="700">Fantopia</text>
+      <text x="580" y="294" fill="#b4d6ec" font-size="11">iMe · Idea Live</text>
+    </g>
+
+    <!-- 右侧副券 -->
+    <rect x="752" y="0" width="208" height="340" fill="url(#stubShade)"/>
+    <line x1="752" y1="18" x2="752" y2="322" stroke="#8dc0e0" stroke-opacity="0.5" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <text x="856" y="48" text-anchor="middle" fill="#8dc0e0" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" letter-spacing="2.2">ADMIT ONE</text>
+    <text x="856" y="76" text-anchor="middle" fill="#ffffff" font-family="'Noto Serif SC', serif" font-size="22" font-weight="700" letter-spacing="3">叁缺壹</text>
+    <text x="856" y="98" text-anchor="middle" fill="#b8d9ef" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="600">2026.11.13 · KUL</text>
+
+    <!-- 条形码 -->
+    <g transform="translate(788 122)" fill="#e4f3fc" opacity="0.88">
+      <rect x="0" y="0" width="4" height="136"/><rect x="7" y="0" width="2" height="136"/>
+      <rect x="12" y="0" width="6" height="136"/><rect x="22" y="0" width="2" height="136"/>
+      <rect x="27" y="0" width="3" height="136"/><rect x="34" y="0" width="5" height="136"/>
+      <rect x="43" y="0" width="2" height="136"/><rect x="48" y="0" width="4" height="136"/>
+      <rect x="55" y="0" width="2" height="136"/><rect x="61" y="0" width="6" height="136"/>
+      <rect x="71" y="0" width="3" height="136"/><rect x="78" y="0" width="2" height="136"/>
+      <rect x="83" y="0" width="5" height="136"/><rect x="92" y="0" width="2" height="136"/>
+      <rect x="98" y="0" width="4" height="136"/><rect x="106" y="0" width="6" height="136"/>
+      <rect x="116" y="0" width="2" height="136"/><rect x="122" y="0" width="3" height="136"/>
+      <rect x="129" y="0" width="5" height="136"/>
+    </g>
+
+    <text x="856" y="286" text-anchor="middle" fill="#8dc0e0" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" letter-spacing="1.6">NO. KUL-261113</text>
+    <text x="856" y="308" text-anchor="middle" fill="#6d9aba" font-family="'JetBrains Mono', monospace" font-size="9.5" letter-spacing="1">IDEA LIVE ARENA</text>
+  </g>
+</svg>

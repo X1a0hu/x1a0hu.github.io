@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" role="img" aria-label="南青乐队 轻舟已过万重山 2024 巡回演出上海站海报">
+  <defs>
+    <linearGradient id="pBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2ede2"/>
+      <stop offset="58%" stop-color="#e4ddd0"/>
+      <stop offset="100%" stop-color="#ccd4cd"/>
+    </linearGradient>
+    <linearGradient id="pMtn1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#53665d" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#53665d" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="pMtn2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2b3a33" stop-opacity="0.54"/>
+      <stop offset="100%" stop-color="#2b3a33" stop-opacity="0.14"/>
+    </linearGradient>
+    <linearGradient id="pMtn3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#19241f" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="#19241f" stop-opacity="0.45"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#pBg)"/>
+  <rect x="24" y="24" width="552" height="752" fill="none" stroke="#2b3a33" stroke-opacity="0.22" stroke-width="1.5"/>
+
+  <text x="300" y="72" text-anchor="middle" fill="#52655b" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600" letter-spacing="3.5">SONICE PRESENTS · 2024 TOUR</text>
+  <text x="300" y="106" text-anchor="middle" fill="#2b3a33" font-family="'Noto Sans SC', sans-serif" font-size="18" font-weight="700" letter-spacing="6">南青乐队 · 不插电专场</text>
+
+  <!-- 竖排主标题 -->
+  <g fill="#19241f" font-family="'Noto Serif SC', serif" font-size="56" font-weight="700" text-anchor="middle">
+    <text x="300" y="192">轻</text>
+    <text x="300" y="254">舟</text>
+    <text x="300" y="316">已</text>
+    <text x="300" y="378">过</text>
+    <text x="300" y="440">万</text>
+    <text x="300" y="502">重</text>
+    <text x="300" y="564">山</text>
+  </g>
+
+  <!-- 朱红印章 -->
+  <g transform="translate(352 496)">
+    <rect width="46" height="46" rx="4" fill="none" stroke="#b83b28" stroke-width="2"/>
+    <text x="23" y="22" text-anchor="middle" fill="#b83b28" font-family="'Noto Serif SC', serif" font-size="14" font-weight="700">南</text>
+    <text x="23" y="39" text-anchor="middle" fill="#b83b28" font-family="'Noto Serif SC', serif" font-size="14" font-weight="700">青</text>
+  </g>
+
+  <!-- 层叠远山 -->
+  <path d="M0 540 Q120 420 245 486 T480 436 T600 492 L600 660 L0 660 Z" fill="url(#pMtn1)"/>
+  <path d="M0 590 Q150 486 300 554 T600 500 L600 660 L0 660 Z" fill="url(#pMtn2)"/>
+  <path d="M0 634 Q180 572 340 618 T600 584 L600 666 L0 666 Z" fill="url(#pMtn3)"/>
+
+  <!-- 江面与轻舟 -->
+  <rect x="0" y="656" width="600" height="144" fill="#1b2621"/>
+  <g transform="translate(178 632)">
+    <path d="M-38 8 Q0 19 42 5 Q20 13 -22 13 Z" fill="#f2ede2"/>
+    <path d="M-5 8 L-2 -18 L22 4 Z" fill="#e2d9c8"/>
+  </g>
+
+  <text x="300" y="704" text-anchor="middle" fill="#f2ede2" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" letter-spacing="2.4">2024.07.05 · SHANGHAI</text>
+  <text x="300" y="738" text-anchor="middle" fill="#bfd0c6" font-family="'Noto Sans SC', sans-serif" font-size="15" font-weight="500" letter-spacing="1.5">万代南梦宫上海文化中心 · 梦想剧场</text>
+</svg>

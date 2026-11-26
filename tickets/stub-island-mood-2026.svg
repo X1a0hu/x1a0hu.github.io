@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" width="960" height="340" role="img" aria-label="岛屿心情 2026.04.17 美丽人生巡演上海站 纪念票根">
+  <defs>
+    <linearGradient id="skyBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#172432"/>
+      <stop offset="52%" stop-color="#293d50"/>
+      <stop offset="84%" stop-color="#7c6c78"/>
+      <stop offset="100%" stop-color="#d49e8a"/>
+    </linearGradient>
+    <radialGradient id="bubbleGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#fff8ee" stop-opacity="0.22"/>
+      <stop offset="55%" stop-color="#f7b2d9" stop-opacity="0.16"/>
+      <stop offset="82%" stop-color="#7ee8fa" stop-opacity="0.42"/>
+      <stop offset="94%" stop-color="#ffd89b" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="prismRim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7ce8ff"/>
+      <stop offset="35%" stop-color="#ff9ad5"/>
+      <stop offset="68%" stop-color="#ffe082"/>
+      <stop offset="100%" stop-color="#8be9fd"/>
+    </linearGradient>
+    <linearGradient id="imStub" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2ede6"/>
+      <stop offset="100%" stop-color="#e4ddd3"/>
+    </linearGradient>
+    <mask id="imMask">
+      <rect x="0" y="0" width="960" height="340" rx="18" fill="#ffffff"/>
+      <circle cx="752" cy="0" r="16" fill="#000000"/>
+      <circle cx="752" cy="340" r="16" fill="#000000"/>
+      <circle cx="0" cy="170" r="10" fill="#000000"/>
+    </mask>
+  </defs>
+
+  <g mask="url(#imMask)">
+    <!-- 主票面：暮色海天 + 虹彩气泡（致敬 2026 美丽人生巡演官方海报） -->
+    <rect x="0" y="0" width="752" height="340" fill="url(#skyBg)"/>
+
+    <!-- 海浪层 -->
+    <path d="M0 248 Q160 226 340 244 T752 232 L752 340 L0 340 Z" fill="#101d2b" opacity="0.72"/>
+    <path d="M0 272 Q220 250 430 270 T752 260 L752 340 L0 340 Z" fill="#0b1521" opacity="0.82"/>
+
+    <!-- 漂浮虹彩气泡 -->
+    <g transform="translate(592 162)">
+      <circle cx="0" cy="0" r="92" fill="url(#bubbleGlow)"/>
+      <circle cx="0" cy="0" r="83" fill="none" stroke="url(#prismRim)" stroke-width="2.4" opacity="0.82"/>
+      <ellipse cx="-28" cy="-32" rx="23" ry="11" transform="rotate(-28 -28 -32)" fill="#ffffff" opacity="0.32"/>
+      <ellipse cx="36" cy="38" rx="14" ry="6" transform="rotate(-28 36 38)" fill="#ffe5b4" opacity="0.26"/>
+    </g>
+
+    <!-- 细线边框 -->
+    <rect x="20" y="18" width="712" height="304" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.18"/>
+
+    <!-- 眉标 -->
+    <text x="42" y="54" fill="#d9e5f0" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="600" letter-spacing="2.4">ISLAND MOOD · 2026 NATIONAL TOUR</text>
+    <rect x="598" y="38" width="112" height="22" rx="4" fill="#ffffff" fill-opacity="0.14" stroke="#ffffff" stroke-opacity="0.32"/>
+    <text x="654" y="53" text-anchor="middle" fill="#fff9f2" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" letter-spacing="1.4">SHANGHAI</text>
+
+    <!-- 乐队与巡演主标题 -->
+    <rect x="42" y="76" width="82" height="24" rx="4" fill="url(#prismRim)" fill-opacity="0.26" stroke="#ffffff" stroke-opacity="0.45"/>
+    <text x="83" y="92" text-anchor="middle" fill="#ffffff" font-family="'Noto Sans SC', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">岛屿心情</text>
+
+    <text x="42" y="156" fill="#ffffff" font-family="'Noto Serif SC', serif" font-size="48" font-weight="700" letter-spacing="4">美丽人生</text>
+    <text x="266" y="154" fill="#f5dfd4" font-family="'Noto Sans SC', sans-serif" font-size="16" font-weight="600" letter-spacing="1.5">新专辑巡演 · 上海站</text>
+
+    <!-- 虚线分隔 -->
+    <line x1="42" y1="214" x2="710" y2="214" stroke="#ffffff" stroke-opacity="0.24" stroke-dasharray="3 4"/>
+
+    <!-- 底部演出信息 -->
+    <g font-family="'JetBrains Mono', 'Noto Sans SC', monospace">
+      <text x="42" y="242" fill="#a8c4d8" font-size="10" letter-spacing="1.8">DATE &amp; TIME</text>
+      <text x="42" y="268" fill="#ffffff" font-size="17" font-weight="700">2026.04.17 FRI · 20:00</text>
+      <text x="42" y="294" fill="#cfdce8" font-size="11">2026 全国巡演 · 上海站</text>
+
+      <text x="308" y="242" fill="#a8c4d8" font-size="10" letter-spacing="1.8">VENUE</text>
+      <text x="308" y="268" fill="#ffffff" font-size="16" font-weight="700">Modern Sky LAB 摩登天空</text>
+      <text x="308" y="294" fill="#cfdce8" font-size="11">上海虹口区 · 瑞虹天地月亮湾</text>
+    </g>
+
+    <!-- 右侧暖白纸质副券 -->
+    <rect x="752" y="0" width="208" height="340" fill="url(#imStub)"/>
+    <line x1="752" y1="18" x2="752" y2="322" stroke="#1e2d3d" stroke-opacity="0.35" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <text x="856" y="48" text-anchor="middle" fill="#465b6e" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" letter-spacing="2.2">ADMIT ONE</text>
+    <text x="856" y="76" text-anchor="middle" fill="#172432" font-family="'Noto Serif SC', serif" font-size="21" font-weight="700" letter-spacing="2">美丽人生</text>
+    <text x="856" y="98" text-anchor="middle" fill="#4f6478" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="600">2026.04.17 · SHA</text>
+
+    <g transform="translate(788 122)" fill="#172432" opacity="0.84">
+      <rect x="0" y="0" width="3" height="136"/><rect x="6" y="0" width="5" height="136"/>
+      <rect x="15" y="0" width="2" height="136"/><rect x="21" y="0" width="4" height="136"/>
+      <rect x="29" y="0" width="2" height="136"/><rect x="34" y="0" width="6" height="136"/>
+      <rect x="44" y="0" width="3" height="136"/><rect x="50" y="0" width="2" height="136"/>
+      <rect x="56" y="0" width="5" height="136"/><rect x="65" y="0" width="2" height="136"/>
+      <rect x="70" y="0" width="4" height="136"/><rect x="78" y="0" width="6" height="136"/>
+      <rect x="88" y="0" width="2" height="136"/><rect x="94" y="0" width="3" height="136"/>
+      <rect x="101" y="0" width="5" height="136"/><rect x="110" y="0" width="2" height="136"/>
+      <rect x="116" y="0" width="4" height="136"/><rect x="124" y="0" width="3" height="136"/>
+      <rect x="130" y="0" width="4" height="136"/>
+    </g>
+
+    <text x="856" y="286" text-anchor="middle" fill="#172432" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" letter-spacing="1.5">NO. SHA-260417</text>
+    <text x="856" y="308" text-anchor="middle" fill="#687a8c" font-family="'JetBrains Mono', monospace" font-size="9.5" letter-spacing="1">MODERN SKY LAB</text>
+  </g>
+</svg>

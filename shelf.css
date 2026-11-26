@@ -2075,9 +2075,40 @@ button {
 
 .tickets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(410px, 1fr));
+  gap: 18px;
   padding: 8px 4px;
+}
+
+/* 专属设计票根 / 实拍票根卡片 (.ticket-art-card) */
+.ticket-art-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, .28));
+  transition: transform .22s cubic-bezier(.22, 1, .36, 1), filter .22s;
+}
+
+.ticket-art-card:hover {
+  transform: translateY(-4px) rotate(-.35deg);
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, .36));
+}
+
+.ticket-art-card.is-selected {
+  transform: translateY(-3px);
+  filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0)) drop-shadow(0 0 2px var(--accent)) drop-shadow(0 12px 24px rgba(0, 0, 0, .34));
+}
+
+.ticket-art-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
 }
 
 .ticket-stub {
@@ -2429,14 +2460,19 @@ button {
   color: var(--g600);
 }
 
-/* 实拍票面画廊 */
+/* 演出海报墙 */
 .media-grid.is-ticket-wall {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 18px;
 }
 
 .art-wrap.is-ticket-card {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 4;
+}
+
+.art-wrap.is-ticket-card .art-img {
+  object-fit: contain;
+  background: #0d0f12;
 }
 
 .ticket-wall-badge {

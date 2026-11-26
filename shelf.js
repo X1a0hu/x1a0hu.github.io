@@ -139,9 +139,10 @@
   }
 
   function getResolvedCover(item, catKey) {
-    if (catKey === 'tickets' && item?.photo) return item.photo;
+    if (catKey === 'tickets') {
+      return item?.cover || item?.photo || item?.ticketArt || '';
+    }
     if (item?.cover) return item.cover;
-    if (catKey === 'tickets') return '';
     const cacheId = `${catKey}:${item?.title || ''}::${item?.creator || ''}`;
     return coverCache[cacheId] || '';
   }
@@ -796,8 +797,29 @@
     return wrap;
   }
 
-  // 构建单个拟物实体演出票根 (.ticket-stub)
+  // 构建单个拟物实体演出票根 (.ticket-stub 或专属设计票根图 .ticket-art-card)
   function buildTicketStub(item, index) {
+    const customArt = item.photo || item.ticketArt;
+    if (customArt) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `ticket-art-card${index === activeItemIndex ? ' is-selected' : ''}`;
+      btn.dataset.idx = String(index);
+      btn.setAttribute('aria-label', `${item.title} - ${item.creator} (${item.date || item.year || ''})`);
+
+      const img = document.createElement('img');
+      img.className = 'ticket-art-img';
+      img.src = customArt;
+      img.alt = `${item.title || ''} 演出票根`;
+      img.loading = index < 6 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      btn.appendChild(img);
+
+      btn.addEventListener('click', () => selectItem(index));
+      btn.addEventListener('pointerenter', () => updateSpotlight(item, index));
+      return btn;
+    }
+
     const btn = document.createElement('button');
     btn.type = 'button';
     const paperColor = item.color || '#e9e3d3';
@@ -813,75 +835,56 @@
     const main = document.createElement('div');
     main.className = 'ticket-main';
 
-    if (item.photo) {
-      const photoFrame = document.createElement('div');
-      photoFrame.className = 'ticket-photo-wrap';
-      photoFrame.appendChild(createCoverImg(item, 'tickets', 'ticket-photo-img', index < 6));
-      const overlay = document.createElement('div');
-      overlay.className = 'ticket-photo-caption';
-      overlay.textContent = [item.title, item.date, item.city].filter(Boolean).join(' · ');
-      photoFrame.appendChild(overlay);
-      main.appendChild(photoFrame);
-    } else {
-      const topRow = document.createElement('div');
-      topRow.className = 'ticket-top-row';
+    const topRow = document.createElement('div');
+    topRow.className = 'ticket-top-row';
 
-      const eyebrow = document.createElement('span');
-      eyebrow.className = 'ticket-eyebrow';
-      eyebrow.textContent = `${item.city || 'LIVE'} · ADMIT ONE`;
-      topRow.appendChild(eyebrow);
+    const eyebrow = document.createElement('span');
+    eyebrow.className = 'ticket-eyebrow';
+    eyebrow.textContent = `${item.city || 'LIVE'} · ADMIT ONE`;
+    topRow.appendChild(eyebrow);
 
-      if (item.isSample) {
-        const sampleBadge = document.createElement('span');
-        sampleBadge.className = 'ticket-sample-pill';
-        sampleBadge.textContent = '示例';
-        topRow.appendChild(sampleBadge);
-      }
-
-      const bodyRow = document.createElement('div');
-      bodyRow.className = 'ticket-body-row';
-
-      if (item.cover) {
-        const thumb = document.createElement('div');
-        thumb.className = 'ticket-mini-art';
-        thumb.appendChild(createCoverImg(item, 'tickets', '', index < 6));
-        bodyRow.appendChild(thumb);
-      }
-
-      const heading = document.createElement('div');
-      heading.className = 'ticket-heading';
-      const creator = document.createElement('span');
-      creator.className = 'ticket-artist';
-      creator.textContent = item.creator || '';
-      const title = document.createElement('h3');
-      title.className = 'ticket-title';
-      title.textContent = item.title || '';
-      heading.append(creator, title);
-      bodyRow.appendChild(heading);
-
-      const metaGrid = document.createElement('div');
-      metaGrid.className = 'ticket-meta-grid';
-      [
-        { k: 'DATE', v: item.date || item.year || '—' },
-        { k: 'VENUE', v: item.venue || item.city || '—' },
-        { k: item.price ? 'SEAT / PRICE' : 'SHOW / TYPE', v: [item.seat, item.price].filter(Boolean).join(' · ') || 'LIVE' },
-      ].forEach(pair => {
-        const cell = document.createElement('div');
-        cell.className = 'ticket-meta-cell';
-        const k = document.createElement('span');
-        k.className = 'ticket-meta-k';
-        k.textContent = pair.k;
-        const v = document.createElement('strong');
-        v.className = 'ticket-meta-v';
-        v.textContent = pair.v;
-        cell.append(k, v);
-        metaGrid.appendChild(cell);
-      });
-
-      main.append(topRow, bodyRow, metaGrid);
+    if (item.isSample) {
+      const sampleBadge = document.createElement('span');
+      sampleBadge.className = 'ticket-sample-pill';
+      sampleBadge.textContent = '示例';
+      topRow.appendChild(sampleBadge);
     }
 
-    // 右侧副券（带上下打孔缺口 + 撕线 + 票号 + 条形码）
+    const bodyRow = document.createElement('div');
+    bodyRow.className = 'ticket-body-row';
+
+    const heading = document.createElement('div');
+    heading.className = 'ticket-heading';
+    const creator = document.createElement('span');
+    creator.className = 'ticket-artist';
+    creator.textContent = item.creator || '';
+    const title = document.createElement('h3');
+    title.className = 'ticket-title';
+    title.textContent = item.title || '';
+    heading.append(creator, title);
+    bodyRow.appendChild(heading);
+
+    const metaGrid = document.createElement('div');
+    metaGrid.className = 'ticket-meta-grid';
+    [
+      { k: 'DATE', v: item.date || item.year || '—' },
+      { k: 'VENUE', v: item.venue || item.city || '—' },
+      { k: item.price ? 'SEAT / PRICE' : 'SHOW / TYPE', v: [item.seat, item.price].filter(Boolean).join(' · ') || 'LIVE' },
+    ].forEach(pair => {
+      const cell = document.createElement('div');
+      cell.className = 'ticket-meta-cell';
+      const k = document.createElement('span');
+      k.className = 'ticket-meta-k';
+      k.textContent = pair.k;
+      const v = document.createElement('strong');
+      v.className = 'ticket-meta-v';
+      v.textContent = pair.v;
+      cell.append(k, v);
+      metaGrid.appendChild(cell);
+    });
+
+    main.append(topRow, bodyRow, metaGrid);
+
     const tear = document.createElement('div');
     tear.className = 'ticket-tear';
 
@@ -979,7 +982,7 @@
         return;
       }
 
-      // 实拍墙 wall
+      // 演出海报墙 wall
       const grid = document.createElement('div');
       grid.className = 'media-grid is-ticket-wall';
       visibleItems.forEach((item, idx) => {
@@ -991,7 +994,7 @@
         const artWrap = document.createElement('div');
         artWrap.className = 'art-wrap is-ticket-card';
         artWrap.style.background = item.color || 'var(--g200)';
-        if (item.photo || item.cover) {
+        if (item.cover || item.photo || item.ticketArt) {
           artWrap.appendChild(createCoverImg(item, 'tickets', 'art-img', idx < 6));
         }
 
