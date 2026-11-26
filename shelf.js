@@ -4,7 +4,18 @@
   const siteConfig = window.SITE_CONFIG || {};
   const shelfConfig = window.SHELF_CONFIG || {};
   const categories = shelfConfig.categories || {};
-  const categoryKeys = Object.keys(categories);
+  const categoryKeys = Object.keys(categories).filter(
+    key => Array.isArray(categories[key]?.items) && categories[key].items.length > 0
+  );
+
+  const FORMAT_META = {
+    cd: { label: 'CD', shortLabel: 'CD', className: 'fmt-cd' },
+    'black-vinyl': { label: '黑胶', shortLabel: '黑胶', className: 'fmt-black-vinyl' },
+    'white-vinyl': { label: '白胶', shortLabel: '白胶', className: 'fmt-white-vinyl' },
+    'color-vinyl': { label: '彩胶', shortLabel: '彩胶', className: 'fmt-color-vinyl' },
+    tape: { label: '磁带', shortLabel: '磁带', className: 'fmt-tape' },
+  };
+  const FORMAT_ORDER = ['cd', 'black-vinyl', 'white-vinyl', 'color-vinyl', 'tape'];
 
   const setText = (id, value) => {
     const el = document.getElementById(id);
@@ -25,18 +36,93 @@
   );
   setText('total-count', totalCurated.toLocaleString());
 
+  function itemFormats(item) {
+    return Array.isArray(item?.formats) ? item.formats.filter(Boolean) : [];
+  }
+
+  function itemHasFormat(item, fmt) {
+    return itemFormats(item).includes(fmt);
+  }
+
+  function itemMatchesLook(item, look) {
+    if (!look || !Array.isArray(look.requiresFormats) || look.requiresFormats.length === 0) {
+      return true;
+    }
+    const fmts = itemFormats(item);
+    return look.requiresFormats.some(req => fmts.includes(req));
+  }
+
+  function getLookDisplayLabel(look, items) {
+    if (look?.id === 'vinyl' && Array.isArray(look.requiresFormats)) {
+      const hasBlack = items.some(it => itemHasFormat(it, 'black-vinyl'));
+      const hasWhite = items.some(it => itemHasFormat(it, 'white-vinyl'));
+      if (hasBlack && hasWhite) return '黑胶 / 白胶';
+      if (hasWhite) return '白胶';
+      if (hasBlack) return '黑胶';
+    }
+    return look?.label || '';
+  }
+
+  function getAvailableLooks(catKey) {
+    const cat = categories[catKey];
+    const rawLooks = Array.isArray(cat?.looks) ? cat.looks : [];
+    const items = Array.isArray(cat?.items) ? cat.items : [];
+    const available = rawLooks.filter(look => {
+      if (!Array.isArray(look.requiresFormats) || look.requiresFormats.length === 0) return true;
+      return items.some(item => itemMatchesLook(item, look));
+    });
+    return available.length > 0 ? available : rawLooks;
+  }
+
+  function getVinylVariant(item) {
+    const fmts = itemFormats(item);
+    if (activeSubFilter === 'white-vinyl' && fmts.includes('white-vinyl')) return 'white';
+    if (activeSubFilter === 'black-vinyl' && fmts.includes('black-vinyl')) return 'black';
+    if (fmts.includes('white-vinyl') && !fmts.includes('black-vinyl')) return 'white';
+    if (fmts.includes('white-vinyl')) return 'white';
+    return 'black';
+  }
+
+  function createFormatBadge(fmt, compact = false) {
+    const meta = FORMAT_META[fmt];
+    if (!meta) return null;
+    const span = document.createElement('span');
+    span.className = `format-tag ${meta.className}${compact ? ' is-compact' : ''}`;
+    span.textContent = compact ? meta.shortLabel : meta.label;
+    return span;
+  }
+
+  function appendFormatBadges(container, formats, compact = false) {
+    if (!container || !Array.isArray(formats) || formats.length === 0) return;
+    formats.forEach(fmt => {
+      const badge = createFormatBadge(fmt, compact);
+      if (badge) container.appendChild(badge);
+    });
+  }
+
   // 状态管理
   const params = new URLSearchParams(location.search);
   const initialKind = params.get('kind');
-  let activeCategory = categories[initialKind] ? initialKind : (shelfConfig.defaultCategory || categoryKeys[0] || 'albums');
-  let activeLook = categories[activeCategory]?.defaultLook || 'cds';
-  let activeEra = 'all';
+  let activeCategory = categoryKeys.includes(initialKind)
+    ? initialKind
+    : (categoryKeys.includes(shelfConfig.defaultCategory) ? shelfConfig.defaultCategory : (categoryKeys[0] || 'albums'));
+  let activeLook = '';
+  let activeSubFilter = 'all';
   let searchQuery = '';
   let showJacket = false;
   let activeItemIndex = 0;
   let visibleItems = [];
 
-  // 本地封面缓存（用于用户日后新增条目未手填 cover 时自动拉取官方封面）
+  function resolveInitialLook(catKey) {
+    const available = getAvailableLooks(catKey);
+    const preferred = categories[catKey]?.defaultLook;
+    if (available.some(l => l.id === preferred)) return preferred;
+    return available[0]?.id || 'covers';
+  }
+
+  activeLook = resolveInitialLook(activeCategory);
+
+  // 本地封面缓存（用于日后新增条目未手填 cover 时自动拉取官方封面）
   const COVER_CACHE_KEY = 'hulab_shelf_cover_cache_v1';
   let coverCache = {};
   try {
@@ -53,13 +139,15 @@
   }
 
   function getResolvedCover(item, catKey) {
+    if (catKey === 'tickets' && item?.photo) return item.photo;
     if (item?.cover) return item.cover;
+    if (catKey === 'tickets') return '';
     const cacheId = `${catKey}:${item?.title || ''}::${item?.creator || ''}`;
     return coverCache[cacheId] || '';
   }
 
   async function autoFetchCoverIfMissing(item, catKey, imgEl) {
-    if (!item || item.cover) return;
+    if (!item || item.cover || catKey === 'tickets') return;
     const cacheId = `${catKey}:${item.title || ''}::${item.creator || ''}`;
     if (coverCache[cacheId]) {
       imgEl.src = coverCache[cacheId];
@@ -91,7 +179,7 @@
     } catch { /* fallback canvas handles missing cover */ }
   }
 
-  // 主题管理（默认暖白亮色，支持一键切换暗黑主题）
+  // 主题管理
   const rootEl = document.documentElement;
   const themeBtn = document.getElementById('toggle-theme');
   const metaThemeColor = document.getElementById('meta-theme-color');
@@ -116,10 +204,16 @@
     }
   });
 
-  // 顶部开关：封面展开
+  // 顶部开关：封面展开（仅在侧脊模式显示）
   const mediaStage = document.getElementById('media-stage');
-
   const jacketBtn = document.getElementById('toggle-jacket');
+  const SPINE_MAP = { cds: 'cd', tapes: 'tape', dvd: 'dvd', spines: 'book' };
+
+  function syncJacketToggleVisibility() {
+    if (!jacketBtn) return;
+    jacketBtn.hidden = !SPINE_MAP[activeLook];
+  }
+
   jacketBtn?.addEventListener('click', () => {
     showJacket = !showJacket;
     jacketBtn.classList.toggle('is-on', showJacket);
@@ -127,7 +221,7 @@
     renderStage();
   });
 
-  // 兜底 Canvas 封面生成器（仅当离线或无封面时触发）
+  // 兜底 Canvas 封面生成器
   function hashStr(str) {
     let h = 2166136261;
     const s = String(str || '');
@@ -164,7 +258,6 @@
     return c.toDataURL('image/png');
   }
 
-  // 构建真实封面 <img> 元素（带自动检索与无图兜底）
   function createCoverImg(item, catKey, className = 'art-img', eager = false) {
     const img = document.createElement('img');
     img.className = className;
@@ -191,7 +284,7 @@
     return img;
   }
 
-  // 渲染 5 大分类导航 Tabs（展示各分类真实微缩封面）
+  // 渲染分类导航 Tabs
   const tabsEl = document.getElementById('tabs');
   function renderTabs() {
     if (!tabsEl) return;
@@ -207,20 +300,24 @@
       const mini = document.createElement('span');
       mini.className = `mini mini-${key}`;
       mini.setAttribute('aria-hidden', 'true');
-      const count = key === 'books' ? 6 : key === 'albums' ? 3 : 4;
+      const count = key === 'books' ? 6 : key === 'albums' ? 3 : key === 'tickets' ? 3 : 4;
       const items = Array.isArray(cat.items) ? cat.items : [];
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < Math.min(count, Math.max(count, items.length)); i++) {
         const swatch = document.createElement('i');
         const sample = items[i] || {};
         swatch.style.background = sample.color || '#334155';
-        const thumbUrl = getResolvedCover(sample, key);
-        if (thumbUrl) {
-          const thumbImg = document.createElement('img');
-          thumbImg.src = thumbUrl;
-          thumbImg.alt = '';
-          thumbImg.loading = 'lazy';
-          thumbImg.referrerPolicy = 'no-referrer';
-          swatch.appendChild(thumbImg);
+        if (key === 'tickets') {
+          swatch.style.borderRight = `3px solid ${sample.accent || '#ffd60a'}`;
+        } else {
+          const thumbUrl = getResolvedCover(sample, key);
+          if (thumbUrl) {
+            const thumbImg = document.createElement('img');
+            thumbImg.src = thumbUrl;
+            thumbImg.alt = '';
+            thumbImg.loading = 'lazy';
+            thumbImg.referrerPolicy = 'no-referrer';
+            swatch.appendChild(thumbImg);
+          }
         }
         mini.appendChild(swatch);
       }
@@ -232,12 +329,14 @@
       btn.addEventListener('click', () => {
         if (activeCategory === key) return;
         activeCategory = key;
-        activeLook = categories[key]?.defaultLook || categories[key]?.looks?.[0]?.id || 'covers';
+        activeSubFilter = 'all';
+        activeLook = resolveInitialLook(key);
         activeItemIndex = 0;
         const url = new URL(location.href);
         url.searchParams.set('kind', key);
         history.replaceState(null, '', url);
         renderTabs();
+        renderSubFilters();
         renderLooks();
         renderAll();
       });
@@ -259,14 +358,87 @@
     spines: '<rect x="3" y="4" width="4" height="16" rx=".8"/><rect x="9" y="3" width="5" height="17" rx=".8"/><rect x="16" y="5" width="5" height="15" rx=".8"/>',
     books: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
     scenes: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 9h20M2 15h20"/>',
+    stubs: '<path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7z"/><path d="M15 5v14" stroke-dasharray="2 2"/>',
+    timeline: '<path d="M7 5v14"/><circle cx="7" cy="7" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="7" cy="17" r="2"/><path d="M12 7h8M12 12h8M12 17h6"/>',
+    wall: '<rect x="3" y="4" width="7" height="10" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/><rect x="3" y="17" width="7" height="3" rx="1"/>',
   };
+
+  // 动态渲染顶部载体 / 年份 / 时间范围筛选条 (#era-picker)
+  const subFilterEl = document.getElementById('era-picker');
+  function renderSubFilters() {
+    if (!subFilterEl) return;
+    subFilterEl.textContent = '';
+
+    const cat = categories[activeCategory];
+    const items = Array.isArray(cat?.items) ? cat.items : [];
+    let options = [];
+
+    if (cat?.filterMode === 'format') {
+      options.push({ id: 'all', label: '全部' });
+      FORMAT_ORDER.forEach(fmt => {
+        const cnt = items.filter(it => itemHasFormat(it, fmt)).length;
+        if (cnt > 0) {
+          options.push({ id: fmt, label: `${FORMAT_META[fmt].label} ${cnt}` });
+        }
+      });
+    } else if (cat?.filterMode === 'year') {
+      options.push({ id: 'all', label: '全部' });
+      const years = [...new Set(items.map(it => String(it.year || '')).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+      years.forEach(y => options.push({ id: y, label: y }));
+    } else {
+      options = [
+        { id: 'all', label: '全部' },
+        { id: '2026', label: '2026' },
+      ];
+    }
+
+    if (!options.some(o => o.id === activeSubFilter)) {
+      activeSubFilter = 'all';
+    }
+
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `seg-btn${opt.id === activeSubFilter ? ' is-active' : ''}`;
+      btn.dataset.filter = opt.id;
+      btn.setAttribute('aria-pressed', String(opt.id === activeSubFilter));
+      btn.textContent = opt.label;
+
+      btn.addEventListener('click', () => {
+        activeSubFilter = opt.id;
+        activeItemIndex = 0;
+
+        // 在实体唱片分类下，按载体筛选时自动匹配最合适的拟物视图
+        if (cat?.filterMode === 'format' && opt.id !== 'all') {
+          const looks = getAvailableLooks(activeCategory);
+          const currentLookObj = looks.find(l => l.id === activeLook);
+          const compatible = !currentLookObj?.requiresFormats || currentLookObj.requiresFormats.includes(opt.id);
+          if (!compatible) {
+            const preferred = looks.find(l => Array.isArray(l.requiresFormats) && l.requiresFormats.includes(opt.id));
+            if (preferred) activeLook = preferred.id;
+          }
+        }
+
+        renderSubFilters();
+        renderLooks();
+        renderAll();
+      });
+
+      subFilterEl.appendChild(btn);
+    });
+  }
 
   const lookBarEl = document.getElementById('look');
   function renderLooks() {
     if (!lookBarEl) return;
     lookBarEl.textContent = '';
     const cat = categories[activeCategory];
-    const looks = Array.isArray(cat?.looks) ? cat.looks : [];
+    const items = Array.isArray(cat?.items) ? cat.items : [];
+    const looks = getAvailableLooks(activeCategory);
+
+    if (!looks.some(l => l.id === activeLook) && looks[0]) {
+      activeLook = looks[0].id;
+    }
 
     looks.forEach(look => {
       const btn = document.createElement('button');
@@ -281,34 +453,41 @@
       swatch.innerHTML = `<svg viewBox="0 0 24 24">${LOOK_ICONS[look.id] || LOOK_ICONS.covers}</svg>`;
 
       const txt = document.createElement('span');
-      txt.textContent = look.label;
+      txt.textContent = getLookDisplayLabel(look, items);
       btn.append(swatch, txt);
+
+      if (cat?.filterMode === 'format') {
+        const matchCount = items.filter(it => itemMatchesLook(it, look)).length;
+        const badge = document.createElement('span');
+        badge.className = 'look-count';
+        badge.textContent = String(matchCount);
+        btn.appendChild(badge);
+      }
 
       btn.addEventListener('click', () => {
         if (activeLook === look.id) return;
         activeLook = look.id;
+
+        // 切换到不兼容当前单载体筛选的视图时自动切回「全部」，避免空架
+        if (cat?.filterMode === 'format' && activeSubFilter !== 'all') {
+          if (Array.isArray(look.requiresFormats) && !look.requiresFormats.includes(activeSubFilter)) {
+            activeSubFilter = 'all';
+            renderSubFilters();
+          }
+        }
+
+        activeItemIndex = 0;
         renderLooks();
-        renderStage();
+        renderAll();
       });
 
       lookBarEl.appendChild(btn);
     });
+
+    syncJacketToggleVisibility();
   }
 
-  // Era 时间范围筛选 & 搜索框
-  document.querySelectorAll('#era-picker .seg-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      activeEra = btn.dataset.era || 'all';
-      activeItemIndex = 0;
-      document.querySelectorAll('#era-picker .seg-btn').forEach(b => {
-        const on = b === btn;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-pressed', String(on));
-      });
-      renderAll();
-    });
-  });
-
+  // 搜索框
   const filterInput = document.getElementById('shelf-filter');
   filterInput?.addEventListener('input', () => {
     searchQuery = filterInput.value.trim().toLowerCase();
@@ -318,24 +497,51 @@
 
   function computeVisibleItems() {
     const cat = categories[activeCategory];
+    const looks = getAvailableLooks(activeCategory);
+    const currentLookObj = looks.find(l => l.id === activeLook);
     let list = Array.isArray(cat?.items) ? [...cat.items] : [];
-    if (activeEra === '2026') {
+
+    // 1. 按载体 / 年份 / era 筛选
+    if (cat?.filterMode === 'format') {
+      if (activeSubFilter !== 'all') {
+        list = list.filter(item => itemHasFormat(item, activeSubFilter));
+      }
+      // 严格按当前视图要求的实体载体过滤（没有的就不放）
+      list = list.filter(item => itemMatchesLook(item, currentLookObj));
+    } else if (cat?.filterMode === 'year') {
+      if (activeSubFilter !== 'all') {
+        list = list.filter(item => String(item.year || '') === activeSubFilter);
+      }
+    } else if (activeSubFilter === '2026') {
       list = list.filter(item => item.era === '2026');
     }
+
+    // 2. 关键词检索
     if (searchQuery) {
-      list = list.filter(item =>
-        [item.title, item.creator, item.year, item.note]
+      list = list.filter(item => {
+        const fmtLabels = itemFormats(item).map(f => FORMAT_META[f]?.label || f);
+        return [
+          item.title,
+          item.creator,
+          item.year,
+          item.date,
+          item.edition,
+          item.city,
+          item.venue,
+          item.seat,
+          item.note,
+          ...fmtLabels,
+        ]
           .filter(Boolean)
-          .some(v => String(v).toLowerCase().includes(searchQuery))
-      );
+          .some(v => String(v).toLowerCase().includes(searchQuery));
+      });
     }
+
     visibleItems = list;
     if (activeItemIndex >= visibleItems.length) {
       activeItemIndex = Math.max(0, visibleItems.length - 1);
     }
   }
-
-  const SPINE_MAP = { cds: 'cd', tapes: 'tape', dvd: 'dvd', spines: 'book' };
 
   function selectItem(index, rerenderSpineJacket = false) {
     if (index < 0 || index >= visibleItems.length) return;
@@ -353,13 +559,23 @@
       node.classList.toggle('is-selected', Number(node.dataset.idx) === activeItemIndex);
     });
 
-    // 若当前处于 Vinyl Spin 模式，同步更新唱机封套与唱片中心真实封面贴纸
+    // 若当前处于 Vinyl Spin 模式，同步更新唱机封套、唱片材质（黑胶/白胶）与中心贴纸
     const item = visibleItems[activeItemIndex];
     const spinSleeve = mediaStage?.querySelector('.spin-sleeve');
+    const spinRecord = mediaStage?.querySelector('.spin-record');
     const spinLabel = mediaStage?.querySelector('.spin-label');
+    const spinBadge = mediaStage?.querySelector('.spin-spec-badge');
     if (spinSleeve && item) {
       spinSleeve.textContent = '';
       spinSleeve.appendChild(createCoverImg(item, activeCategory, 'art-img', true));
+    }
+    if (spinRecord && item) {
+      const isWhite = getVinylVariant(item) === 'white';
+      spinRecord.classList.toggle('is-white-vinyl', isWhite);
+      if (spinBadge) {
+        spinBadge.className = `spin-spec-badge ${isWhite ? 'is-white' : 'is-black'}`;
+        spinBadge.textContent = isWhite ? '白胶 · 33⅓ RPM' : '黑胶 · 33⅓ RPM';
+      }
     }
     if (spinLabel && item) {
       spinLabel.style.background = item.accent || '#ffd60a';
@@ -370,7 +586,6 @@
     updateSpotlight(item, activeItemIndex);
   }
 
-  // 构建展开的正面专辑/影视/书籍封面页（.active-jacket）
   function buildActiveJacket(item) {
     const isPoster = activeCategory === 'movies' || activeCategory === 'tv' || activeCategory === 'books';
     const wrap = document.createElement('div');
@@ -406,7 +621,7 @@
     return /[\u4e00-\u9fff]/.test(String(str || ''));
   }
 
-  // 构建侧脊元素：1:1 复刻源站晶透塑料壳 + 实色纸卡（CDs / Tapes / DVD / 书脊）
+  // 构建侧脊元素（CDs / Tapes / DVD / 书脊）
   function buildSpineElement(item, index, spineType) {
     const btn = document.createElement('button');
     const typoClasses = ['', 'typo-serif', 'typo-upper', 'typo-italic', 'typo-serif'];
@@ -419,7 +634,6 @@
     const paperColor = item.color || '#1f2937';
     const paperInk = getSpineInk(paperColor);
 
-    // 1. CD 晶透塑料壳 + 实色纸卡侧脊
     if (spineType === 'cd') {
       const paper = document.createElement('div');
       paper.className = 'case-paper';
@@ -433,13 +647,28 @@
       const textWrap = document.createElement('div');
       textWrap.className = 'cd-text';
 
+      const artistText = String(item.creator || '');
+      const titleText = String(item.title || '');
       const artist = document.createElement('span');
       artist.className = 'cd-artist';
-      artist.textContent = item.creator || '';
+      artist.textContent = artistText;
 
       const title = document.createElement('span');
       title.className = 'cd-title';
-      title.textContent = item.title || '';
+      title.textContent = titleText;
+
+      // 根据中英文字符视觉长度自适应字号，避免超长专辑名在侧脊首尾被裁切
+      const visualLen = str => [...str].reduce((n, ch) => n + (/[\u4e00-\u9fff]/.test(ch) ? 1.55 : 0.72), 0);
+      const totalLen = visualLen(artistText) + visualLen(titleText);
+      if (totalLen > 24) {
+        artist.style.fontSize = '9px';
+        title.style.fontSize = '10px';
+        textWrap.style.gap = '4px';
+      } else if (totalLen > 17) {
+        artist.style.fontSize = '10px';
+        title.style.fontSize = '11px';
+        textWrap.style.gap = '5px';
+      }
 
       if (paperColor === '#101012' && item.accent) {
         title.style.color = item.accent;
@@ -459,7 +688,6 @@
       return btn;
     }
 
-    // 2. 磁带 Norelco 晶透卡带盒 + 大号歌手名 + 标题 + 底部无边框渐隐封面
     if (spineType === 'tape') {
       const paper = document.createElement('div');
       paper.className = 'case-paper';
@@ -502,7 +730,6 @@
       return btn;
     }
 
-    // 3. DVD 与 书籍侧脊
     btn.style.background = `linear-gradient(180deg, ${paperColor} 0%, color-mix(in srgb, ${paperColor} 76%, #000) 100%)`;
 
     const bgCover = createCoverImg(item, activeCategory, 'spine-bg', index < 8);
@@ -552,6 +779,128 @@
     return btn;
   }
 
+  // 构建确定性条形码（演出票根副券用）
+  function buildBarcode(seedStr) {
+    const wrap = document.createElement('div');
+    wrap.className = 'ticket-barcode';
+    wrap.setAttribute('aria-hidden', 'true');
+    let h = hashStr(seedStr || 'ticket');
+    for (let i = 0; i < 18; i++) {
+      h = Math.imul(h ^ (i + 7), 16777619) >>> 0;
+      const bar = document.createElement('span');
+      const w = (h % 3) + 1;
+      bar.style.height = `${w}px`;
+      bar.style.opacity = String(0.55 + ((h >> 3) % 4) * 0.12);
+      wrap.appendChild(bar);
+    }
+    return wrap;
+  }
+
+  // 构建单个拟物实体演出票根 (.ticket-stub)
+  function buildTicketStub(item, index) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    const paperColor = item.color || '#e9e3d3';
+    const inkColor = getSpineInk(paperColor);
+    const isDarkPaper = inkColor !== '#191816';
+    btn.className = `ticket-stub${isDarkPaper ? ' is-dark-paper' : ''}${index === activeItemIndex ? ' is-selected' : ''}`;
+    btn.dataset.idx = String(index);
+    btn.style.setProperty('--ticket-paper', paperColor);
+    btn.style.setProperty('--ticket-ink', inkColor);
+    btn.style.setProperty('--ticket-accent', item.accent || '#d97706');
+    btn.setAttribute('aria-label', `${item.title} - ${item.creator} (${item.date || item.year || ''})`);
+
+    const main = document.createElement('div');
+    main.className = 'ticket-main';
+
+    if (item.photo) {
+      const photoFrame = document.createElement('div');
+      photoFrame.className = 'ticket-photo-wrap';
+      photoFrame.appendChild(createCoverImg(item, 'tickets', 'ticket-photo-img', index < 6));
+      const overlay = document.createElement('div');
+      overlay.className = 'ticket-photo-caption';
+      overlay.textContent = [item.title, item.date, item.city].filter(Boolean).join(' · ');
+      photoFrame.appendChild(overlay);
+      main.appendChild(photoFrame);
+    } else {
+      const topRow = document.createElement('div');
+      topRow.className = 'ticket-top-row';
+
+      const eyebrow = document.createElement('span');
+      eyebrow.className = 'ticket-eyebrow';
+      eyebrow.textContent = `${item.city || 'LIVE'} · ADMIT ONE`;
+      topRow.appendChild(eyebrow);
+
+      if (item.isSample) {
+        const sampleBadge = document.createElement('span');
+        sampleBadge.className = 'ticket-sample-pill';
+        sampleBadge.textContent = '示例';
+        topRow.appendChild(sampleBadge);
+      }
+
+      const bodyRow = document.createElement('div');
+      bodyRow.className = 'ticket-body-row';
+
+      if (item.cover) {
+        const thumb = document.createElement('div');
+        thumb.className = 'ticket-mini-art';
+        thumb.appendChild(createCoverImg(item, 'tickets', '', index < 6));
+        bodyRow.appendChild(thumb);
+      }
+
+      const heading = document.createElement('div');
+      heading.className = 'ticket-heading';
+      const creator = document.createElement('span');
+      creator.className = 'ticket-artist';
+      creator.textContent = item.creator || '';
+      const title = document.createElement('h3');
+      title.className = 'ticket-title';
+      title.textContent = item.title || '';
+      heading.append(creator, title);
+      bodyRow.appendChild(heading);
+
+      const metaGrid = document.createElement('div');
+      metaGrid.className = 'ticket-meta-grid';
+      [
+        { k: 'DATE', v: item.date || item.year || '—' },
+        { k: 'VENUE', v: item.venue || item.city || '—' },
+        { k: 'SEAT / PRICE', v: [item.seat, item.price].filter(Boolean).join(' · ') || 'GA' },
+      ].forEach(pair => {
+        const cell = document.createElement('div');
+        cell.className = 'ticket-meta-cell';
+        const k = document.createElement('span');
+        k.className = 'ticket-meta-k';
+        k.textContent = pair.k;
+        const v = document.createElement('strong');
+        v.className = 'ticket-meta-v';
+        v.textContent = pair.v;
+        cell.append(k, v);
+        metaGrid.appendChild(cell);
+      });
+
+      main.append(topRow, bodyRow, metaGrid);
+    }
+
+    // 右侧副券（带上下打孔缺口 + 撕线 + 票号 + 条形码）
+    const tear = document.createElement('div');
+    tear.className = 'ticket-tear';
+
+    const serial = document.createElement('span');
+    serial.className = 'ticket-serial';
+    serial.textContent = item.serial || `NO.${String(index + 1).padStart(4, '0')}`;
+
+    const stamp = document.createElement('span');
+    stamp.className = 'ticket-date-vert';
+    stamp.textContent = item.date || item.year || 'LIVE';
+
+    tear.append(stamp, buildBarcode(`${item.title}-${item.date}-${item.serial}`), serial);
+
+    btn.append(main, tear);
+    btn.addEventListener('click', () => selectItem(index));
+    btn.addEventListener('pointerenter', () => updateSpotlight(item, index));
+    return btn;
+  }
+
   // 渲染核心拟物舞台 #media-stage
   function renderStage() {
     if (!mediaStage) return;
@@ -562,12 +911,114 @@
       empty.style.textAlign = 'center';
       empty.style.color = 'var(--g500)';
       empty.style.padding = '48px 16px';
-      empty.textContent = '没有找到匹配当前筛选条件的作品。';
+      empty.textContent = '没有找到匹配当前筛选条件的馆藏。';
       mediaStage.appendChild(empty);
       return;
     }
 
-    // 1. 侧脊排架类（CDs / Tapes / VHS / DVD / Book Spines）+ 选中项的真实正面封面页
+    // 0. 演出票根类展示（票根墙 Stubs / 观演志 Timeline / 实拍墙 Wall）
+    if (activeCategory === 'tickets') {
+      if (activeLook === 'stubs') {
+        const grid = document.createElement('div');
+        grid.className = 'tickets-grid';
+        visibleItems.forEach((item, idx) => grid.appendChild(buildTicketStub(item, idx)));
+        mediaStage.appendChild(grid);
+        return;
+      }
+
+      if (activeLook === 'timeline') {
+        const list = document.createElement('div');
+        list.className = 'ticket-timeline';
+        visibleItems.forEach((item, idx) => {
+          const row = document.createElement('button');
+          row.type = 'button';
+          row.className = `timeline-row${idx === activeItemIndex ? ' is-selected' : ''}`;
+          row.dataset.idx = String(idx);
+
+          const dateCol = document.createElement('div');
+          dateCol.className = 'timeline-date';
+          dateCol.textContent = item.date || item.year || '—';
+
+          const dot = document.createElement('span');
+          dot.className = 'timeline-dot';
+          dot.style.background = item.accent || 'var(--accent)';
+
+          const body = document.createElement('div');
+          body.className = 'timeline-body';
+
+          const head = document.createElement('div');
+          head.className = 'timeline-head';
+          const title = document.createElement('strong');
+          title.className = 'timeline-title';
+          title.textContent = item.title || '';
+          const artist = document.createElement('span');
+          artist.className = 'timeline-artist';
+          artist.textContent = item.creator || '';
+          head.append(title, artist);
+          if (item.isSample) {
+            const sp = document.createElement('span');
+            sp.className = 'ticket-sample-pill is-inline';
+            sp.textContent = '示例';
+            head.appendChild(sp);
+          }
+
+          const place = document.createElement('p');
+          place.className = 'timeline-place';
+          place.textContent = [item.city, item.venue, item.seat, item.price].filter(Boolean).join(' · ');
+
+          const note = document.createElement('p');
+          note.className = 'timeline-note';
+          note.textContent = item.note || '';
+
+          body.append(head, place, note);
+          row.append(dateCol, dot, body);
+          row.addEventListener('click', () => selectItem(idx));
+          list.appendChild(row);
+        });
+        mediaStage.appendChild(list);
+        return;
+      }
+
+      // 实拍墙 wall
+      const grid = document.createElement('div');
+      grid.className = 'media-grid is-ticket-wall';
+      visibleItems.forEach((item, idx) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `grid-card${idx === activeItemIndex ? ' is-selected' : ''}`;
+        card.dataset.idx = String(idx);
+
+        const artWrap = document.createElement('div');
+        artWrap.className = 'art-wrap is-ticket-card';
+        artWrap.style.background = item.color || 'var(--g200)';
+        if (item.photo || item.cover) {
+          artWrap.appendChild(createCoverImg(item, 'tickets', 'art-img', idx < 6));
+        }
+
+        const stamp = document.createElement('span');
+        stamp.className = 'ticket-wall-badge';
+        stamp.textContent = item.date || item.year || 'LIVE';
+        artWrap.appendChild(stamp);
+
+        const meta = document.createElement('div');
+        meta.className = 'grid-meta';
+        const t = document.createElement('p');
+        t.className = 'grid-title';
+        t.textContent = item.title || '';
+        const sub = document.createElement('p');
+        sub.className = 'grid-sub';
+        sub.textContent = [item.creator, item.city].filter(Boolean).join(' · ');
+        meta.append(t, sub);
+
+        card.append(artWrap, meta);
+        card.addEventListener('click', () => selectItem(idx));
+        grid.appendChild(card);
+      });
+      mediaStage.appendChild(grid);
+      return;
+    }
+
+    // 1. 侧脊排架类（CDs / Tapes / DVD / Book Spines）
     if (SPINE_MAP[activeLook]) {
       const rack = document.createElement('div');
       rack.className = 'shelf-rack';
@@ -581,21 +1032,26 @@
       return;
     }
 
-    // 2. Vinyl Spin 动态旋转黑胶唱机模式（真实专辑封套 + 中心带真实封面的旋转黑胶）
+    // 2. Vinyl Spin 动态旋转黑胶 / 白胶唱机模式
     if (activeLook === 'spin') {
       const activeItem = visibleItems[activeItemIndex] || visibleItems[0];
+      const isWhite = getVinylVariant(activeItem) === 'white';
       const stage = document.createElement('div');
       stage.className = 'turntable-stage';
 
       const platter = document.createElement('div');
       platter.className = 'platter-zone';
 
+      const specBadge = document.createElement('span');
+      specBadge.className = `spin-spec-badge ${isWhite ? 'is-white' : 'is-black'}`;
+      specBadge.textContent = isWhite ? '白胶 · 33⅓ RPM' : '黑胶 · 33⅓ RPM';
+
       const sleeve = document.createElement('div');
       sleeve.className = 'spin-sleeve';
       sleeve.appendChild(createCoverImg(activeItem, activeCategory, 'art-img', true));
 
       const record = document.createElement('div');
-      record.className = 'spin-record';
+      record.className = `spin-record${isWhite ? ' is-white-vinyl' : ''}`;
       const label = document.createElement('div');
       label.className = 'spin-label';
       label.style.background = activeItem?.accent || '#ffd60a';
@@ -605,17 +1061,28 @@
       label.appendChild(hole);
       record.appendChild(label);
 
-      platter.append(sleeve, record);
+      const tonearm = document.createElement('div');
+      tonearm.className = 'spin-tonearm';
+      tonearm.setAttribute('aria-hidden', 'true');
+
+      platter.append(specBadge, sleeve, record, tonearm);
 
       const picker = document.createElement('div');
       picker.className = 'spin-picker';
       visibleItems.forEach((item, idx) => {
         const tBtn = document.createElement('button');
         tBtn.type = 'button';
+        const thumbWhite = getVinylVariant(item) === 'white';
         tBtn.className = `spin-thumb-btn${idx === activeItemIndex ? ' is-selected' : ''}`;
         tBtn.dataset.idx = String(idx);
-        tBtn.title = `#${idx + 1} ${item.title}`;
+        tBtn.title = `#${idx + 1} ${item.title} (${thumbWhite ? '白胶' : '黑胶'})`;
         tBtn.appendChild(createCoverImg(item, activeCategory, 'art-img', idx < 8));
+
+        const dot = document.createElement('span');
+        dot.className = `spin-thumb-dot ${thumbWhite ? 'is-white' : 'is-black'}`;
+        dot.setAttribute('aria-hidden', 'true');
+        tBtn.appendChild(dot);
+
         tBtn.addEventListener('click', () => selectItem(idx));
         picker.appendChild(tBtn);
       });
@@ -637,8 +1104,7 @@
 
         const thumbWrap = document.createElement('div');
         thumbWrap.className = 'player-thumb';
-        const img = createCoverImg(item, activeCategory, 'art-img', idx < 6);
-        thumbWrap.appendChild(img);
+        thumbWrap.appendChild(createCoverImg(item, activeCategory, 'art-img', idx < 6));
 
         const info = document.createElement('div');
         info.className = 'player-info';
@@ -665,7 +1131,7 @@
       return;
     }
 
-    // 4. Vinyl / Covers / Posters / 3D Books / VHS 正面纸套 / Scenes 网格模式（全部使用真实封面）
+    // 4. Vinyl（黑胶 / 白胶半抽出）/ Covers / Posters / 3D Books / VHS / Scenes 网格模式
     const grid = document.createElement('div');
     grid.className = `media-grid${activeLook === 'vinyl' ? ' is-vinyl-grid' : activeLook === 'scenes' ? ' is-scenes-grid' : ''}`;
 
@@ -690,14 +1156,14 @@
         artWrap.appendChild(banner);
       }
 
-      const img = createCoverImg(item, activeCategory, 'art-img', idx < 8);
-      artWrap.appendChild(img);
+      artWrap.appendChild(createCoverImg(item, activeCategory, 'art-img', idx < 8));
 
       if (activeLook === 'vinyl') {
+        const isWhite = getVinylVariant(item) === 'white';
         const sleeveWrap = document.createElement('div');
         sleeveWrap.className = 'vinyl-sleeve-wrap';
         const disc = document.createElement('div');
-        disc.className = 'vinyl-disc';
+        disc.className = `vinyl-disc${isWhite ? ' is-white-vinyl' : ''}`;
         disc.style.setProperty('--disc-accent', item.accent || '#ffd60a');
         const discLabel = document.createElement('div');
         discLabel.className = 'vinyl-disc-label';
@@ -719,6 +1185,17 @@
       sub.textContent = item.creator || '';
       meta.append(title, sub);
 
+      const fmts = itemFormats(item);
+      if (fmts.length > 0) {
+        const badges = document.createElement('div');
+        badges.className = 'grid-formats';
+        const displayFmts = activeLook === 'vinyl'
+          ? fmts.filter(f => f === 'black-vinyl' || f === 'white-vinyl' || f === 'color-vinyl')
+          : fmts;
+        appendFormatBadges(badges, displayFmts.length > 0 ? displayFmts : fmts, true);
+        meta.appendChild(badges);
+      }
+
       card.appendChild(meta);
       card.addEventListener('click', () => selectItem(idx));
       grid.appendChild(card);
@@ -727,7 +1204,7 @@
     mediaStage.appendChild(grid);
   }
 
-  // 更新 Spotlight 详情卡（带真实高清封面）
+  // 更新 Spotlight 详情卡
   function updateSpotlight(itemOverride, idxOverride) {
     const spotlightEl = document.getElementById('spotlight');
     const idx = idxOverride !== undefined ? idxOverride : activeItemIndex;
@@ -747,10 +1224,58 @@
 
     const pad = n => String(n).padStart(2, '0');
     setText('spotlight-rank', `#${pad(idx + 1)}`);
-    setText('spotlight-year', item.year || '');
-    setText('spotlight-rating', item.rating ? `★ ${item.rating}` : '');
+    setText('spotlight-year', activeCategory === 'tickets' ? (item.date || item.year || '') : (item.year || ''));
+
+    const ratingEl = document.getElementById('spotlight-rating');
+    if (ratingEl) {
+      if (activeCategory === 'tickets') {
+        const ticketMeta = [item.city, item.price].filter(Boolean).join(' · ');
+        ratingEl.textContent = ticketMeta;
+        ratingEl.hidden = !ticketMeta;
+      } else {
+        ratingEl.textContent = item.rating ? `★ ${item.rating}` : '';
+        ratingEl.hidden = !item.rating;
+      }
+    }
+
+    const formatsEl = document.getElementById('spotlight-formats');
+    if (formatsEl) {
+      formatsEl.textContent = '';
+      if (activeCategory === 'tickets') {
+        if (item.seat) {
+          const seatTag = document.createElement('span');
+          seatTag.className = 'format-tag fmt-ticket';
+          seatTag.textContent = item.seat;
+          formatsEl.appendChild(seatTag);
+        }
+        if (item.isSample) {
+          const sp = document.createElement('span');
+          sp.className = 'ticket-sample-pill is-inline';
+          sp.textContent = '示例票根';
+          formatsEl.appendChild(sp);
+        }
+      } else {
+        appendFormatBadges(formatsEl, itemFormats(item));
+      }
+    }
+
     setText('spotlight-title', item.title || '');
-    setText('spotlight-creator', item.creator || '');
+    setText(
+      'spotlight-creator',
+      activeCategory === 'tickets'
+        ? [item.creator, item.venue].filter(Boolean).join(' · ')
+        : (item.creator || '')
+    );
+
+    const editionEl = document.getElementById('spotlight-edition');
+    if (editionEl) {
+      const editionText = activeCategory === 'tickets'
+        ? (item.serial ? `票号 ${item.serial}` : '')
+        : (item.edition || '');
+      editionEl.textContent = editionText;
+      editionEl.hidden = !editionText;
+    }
+
     setText('spotlight-note', item.note || '');
   }
 
@@ -764,7 +1289,7 @@
     selectItem((activeItemIndex + 1) % visibleItems.length, true);
   });
 
-  // 渲染底部完整列表索引 #titles（带真实微缩封面）
+  // 渲染底部完整列表索引 #titles
   const titlesEl = document.getElementById('titles');
   function renderIndexList() {
     if (!titlesEl) return;
@@ -791,10 +1316,21 @@
       title.textContent = item.title || '';
       const who = document.createElement('p');
       who.className = 'line-who';
-      who.textContent = [item.creator, item.year].filter(Boolean).join(' · ');
+      who.textContent = activeCategory === 'tickets'
+        ? [item.creator, item.date || item.year, item.city].filter(Boolean).join(' · ')
+        : [item.creator, item.year].filter(Boolean).join(' · ');
       meta.append(title, who);
 
-      li.append(mark, num, meta);
+      const fmts = itemFormats(item);
+      if (fmts.length > 0) {
+        const tagWrap = document.createElement('div');
+        tagWrap.className = 'line-formats';
+        appendFormatBadges(tagWrap, fmts, true);
+        li.append(mark, num, meta, tagWrap);
+      } else {
+        li.append(mark, num, meta);
+      }
+
       li.addEventListener('click', () => selectItem(idx, true));
       titlesEl.appendChild(li);
     });
@@ -803,10 +1339,56 @@
   function renderAll() {
     computeVisibleItems();
     const cat = categories[activeCategory] || {};
+    const looks = getAvailableLooks(activeCategory);
+    const currentLookObj = looks.find(l => l.id === activeLook);
+
     setText('shelf-heading', `${cat.label || activeCategory} · ${cat.cnLabel || ''}`);
     setText('category-count', String(visibleItems.length));
-    setText('post-handle', `${handle} · ${activeEra === 'all' ? '全部记录' : activeEra}`);
-    setText('post-caption', `${cat.cnLabel || cat.label || activeCategory} · ${visibleItems.length} 项记录`);
+
+    let subLabel = '全部馆藏';
+    if (cat.filterMode === 'format') {
+      const allCatItems = Array.isArray(cat.items) ? cat.items : [];
+      subLabel = activeSubFilter === 'all'
+        ? (getLookDisplayLabel(currentLookObj, allCatItems) || '实体唱片')
+        : `${FORMAT_META[activeSubFilter]?.label || activeSubFilter}`;
+    } else if (activeSubFilter !== 'all') {
+      subLabel = activeSubFilter;
+    }
+
+    setText('post-handle', `${handle} · ${subLabel}`);
+    setText(
+      'well-label',
+      activeCategory === 'tickets'
+        ? 'Preview · Concert Ticket Stubs'
+        : cat.filterMode === 'format'
+          ? 'Preview · Owned Physical Media'
+          : 'Preview · Physical Shelf'
+    );
+
+    if (cat.filterMode === 'format') {
+      const cdCount = visibleItems.filter(it => itemHasFormat(it, 'cd')).length;
+      const blackCount = visibleItems.filter(it => itemHasFormat(it, 'black-vinyl')).length;
+      const whiteCount = visibleItems.filter(it => itemHasFormat(it, 'white-vinyl')).length;
+      const parts = [];
+      if (activeLook === 'cds') {
+        if (cdCount) parts.push(`CD ${cdCount}`);
+      } else if (activeLook === 'vinyl' || activeLook === 'spin') {
+        if (blackCount) parts.push(`黑胶 ${blackCount}`);
+        if (whiteCount) parts.push(`白胶 ${whiteCount}`);
+      } else {
+        if (cdCount) parts.push(`CD ${cdCount}`);
+        if (blackCount) parts.push(`黑胶 ${blackCount}`);
+        if (whiteCount) parts.push(`白胶 ${whiteCount}`);
+      }
+      const statStr = parts.length ? `（${parts.join(' · ')}）` : '';
+      setText('post-caption', `${cat.cnLabel || '实体唱片'} · ${visibleItems.length} 张${statStr}`);
+    } else if (activeCategory === 'tickets') {
+      setText('post-caption', `演出票根 · ${visibleItems.length} 场现场记录`);
+    } else {
+      setText('post-caption', `${cat.cnLabel || cat.label || activeCategory} · ${visibleItems.length} 项记录`);
+    }
+
+    syncJacketToggleVisibility();
     renderStage();
     updateSpotlight();
     renderIndexList();
@@ -817,11 +1399,11 @@
     if (visibleItems.length === 0) return;
     const cat = categories[activeCategory] || {};
     const isDark = rootEl.getAttribute('data-theme') === 'dark';
-    const cols = Math.min(14, Math.max(8, visibleItems.length));
+    const cols = Math.min(12, Math.max(6, visibleItems.length));
     const rows = Math.ceil(visibleItems.length / cols);
-    const spineW = 54;
+    const spineW = 62;
     const spineH = 340;
-    const gapX = 10;
+    const gapX = 12;
     const gapY = 28;
     const padX = 60;
     const padY = 110;
@@ -850,25 +1432,39 @@
       const row = Math.floor(i / cols);
       const x = padX + col * (spineW + gapX);
       const y = padY + row * (spineH + gapY);
+      const bg = item.color || '#1f2937';
+      const ink = getSpineInk(bg);
 
-      ctx.fillStyle = item.color || '#1f2937';
+      ctx.fillStyle = bg;
       ctx.fillRect(x, y, spineW, spineH);
 
       ctx.fillStyle = item.accent || '#ffd60a';
       ctx.fillRect(x, y, spineW, 12);
 
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillStyle = 'rgba(255,255,255,0.16)';
       ctx.fillRect(x, y, 7, spineH);
 
       ctx.save();
-      ctx.translate(x + spineW / 2, y + 58);
+      ctx.translate(x + spineW / 2, y + 48);
       ctx.rotate(Math.PI / 2);
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = ink;
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.font = '700 14px "Space Grotesk", "Noto Sans SC", sans-serif';
       ctx.fillText(String(item.title || '').slice(0, 18), 0, 0);
       ctx.restore();
+
+      const badgeText = activeCategory === 'tickets'
+        ? String(item.year || '')
+        : itemFormats(item).map(f => FORMAT_META[f]?.shortLabel || f).join('/');
+      if (badgeText) {
+        ctx.fillStyle = ink;
+        ctx.globalAlpha = 0.72;
+        ctx.font = '600 9px "JetBrains Mono", "Noto Sans SC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(badgeText.slice(0, 8), x + spineW / 2, y + spineH - 12);
+        ctx.globalAlpha = 1;
+      }
     });
 
     const link = document.createElement('a');
@@ -922,6 +1518,7 @@
   }
 
   renderTabs();
+  renderSubFilters();
   renderLooks();
   renderAll();
 })();

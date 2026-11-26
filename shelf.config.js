@@ -1,14 +1,29 @@
 // 修改此文件即可管理「书影音」各分类的作品，按填写顺序上架。
-// 字段说明：
-// - title: 作品名称
-// - creator: 创作者（歌手 / 作者 / 导演 / 出品方）
-// - year: 年份（如 2026、2024、1999）
-// - era: '2026' 表示收录在 2026 年记录中；选择「全部」时展示所有条目。
-// - color: 拟物侧脊/封面的主色调（十六进制颜色）
-// - accent: 辅助渐变或唱片中心贴纸色
-// - cover: 可选，自定义封面图片路径（如 './photos/xxx.jpg' 或 'https://...'）；未填时自动生成高质感艺术封面
-// - rating: 可选，个人评分（如 '9.8' 或 '★★★★★'）
-// - note: 可选，你对这部作品的一句话短评（点击或悬停侧脊时在展台下方展示）
+//
+// 【实体唱片 albums 字段说明】
+// - title: 专辑名称
+// - creator: 歌手 / 乐队
+// - year: 发行年份
+// - formats: 你实际拥有的实体载体数组（严格做到「有的才放，没有的不放」）：
+//     'cd'          -> CD（出现在「CD 架」与「全部实体」）
+//     'black-vinyl' -> 黑胶（出现在「黑胶 / 白胶」「唱机」与「全部实体」，渲染为经典黑胶）
+//     'white-vinyl' -> 白胶（出现在「黑胶 / 白胶」「唱机」与「全部实体」，渲染为乳白白胶）
+//     * 一张专辑可同时填多个载体，如 ['cd', 'black-vinyl']；未拥有的形态会自动隐藏。
+// - edition: 可选，版本 / 厂牌 / 编号备注（如 '2024 再版白胶 · 局部娱乐'）
+// - color / accent: 拟物侧脊与细节配色
+// - cover: 封面路径（已保存在 ./covers/，支持自定义替换或填写外链）
+// - rating / note: 个人评分与短评
+//
+// 【演出票根 tickets 字段说明】
+// - title: 演出 / 巡演名称
+// - creator: 乐队 / 音乐人
+// - date: 演出日期（如 '2024.05.02'）
+// - year: 年份（用于顶部年份筛选）
+// - city / venue: 城市与场馆
+// - seat / price / serial: 区域票种、票价与票号（可选）
+// - photo: 可选，你的实拍实体票根照片路径（推荐放在 ./tickets/ 目录）；未填时自动生成复古拟物票面
+// - cover: 可选，演出海报或关联封面
+// - isSample: true 表示示例占位票根，换成你真实看过的演出后删掉该字段即可
 window.SHELF_CONFIG = Object.freeze({
   title: '书影音',
   handle: '@X1a0hu',
@@ -18,31 +33,223 @@ window.SHELF_CONFIG = Object.freeze({
   categories: {
     albums: {
       label: 'Albums',
-      cnLabel: '专辑',
+      cnLabel: '实体唱片',
+      filterMode: 'format',
       defaultLook: 'cds',
       looks: [
-        { id: 'cds', label: 'CDs' },
-        { id: 'tapes', label: 'Tapes' },
-        { id: 'covers', label: 'Covers' },
-        { id: 'vinyl', label: 'Vinyl' },
-        { id: 'spin', label: 'Vinyl Spin' },
-        { id: 'player', label: 'Player' },
+        { id: 'cds', label: 'CD 架', requiresFormats: ['cd'] },
+        { id: 'vinyl', label: '黑胶 / 白胶', requiresFormats: ['black-vinyl', 'white-vinyl'] },
+        { id: 'spin', label: '唱机', requiresFormats: ['black-vinyl', 'white-vinyl'] },
+        { id: 'covers', label: '全部实体' },
+        { id: 'tapes', label: '磁带', requiresFormats: ['tape'] },
       ],
       items: [
-        { title: 'Random Access Memories', creator: 'Daft Punk', year: '2013', era: '2026', color: '#0e0e10', accent: '#e5b85c', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg', rating: '10.0', note: '模拟合成器与真人乐手录制的巅峰之作，吉奥乔独白百听不厌。' },
-        { title: 'Blonde', creator: 'Frank Ocean', year: '2016', era: '2026', color: '#edeae4', accent: '#2c6b4f', cover: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.jpeg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.8', note: '极简吉他与环境采样编织出的夏日记忆，越到深夜越有后劲。' },
-        { title: 'In Rainbows', creator: 'Radiohead', year: '2007', era: '2026', color: '#101012', accent: '#e8432d', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/dd/50/c7/dd50c790-99ac-d3d0-5ab8-e3891fb8fd52/634904032463.png/600x600bb.jpg', rating: '9.9', note: '冰冷电子与温暖器乐最完美的一次平衡，Weird Fishes 的鼓点永远迷人。' },
-        { title: '范特西', creator: '周杰伦', year: '2001', era: '2026', color: '#c41e24', accent: '#f7e4b4', cover: 'https://upload.wikimedia.org/wikipedia/en/6/65/Jaychou_fantasy.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '10.0', note: '华语流行编曲想象力的天花板，每一首都像一部微型电影。' },
-        { title: 'Currents', creator: 'Tame Impala', year: '2015', era: '2026', color: '#4c4663', accent: '#f4a261', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/64/48/5c/64485cc9-968c-68cc-764e-9a7c71733def/00602567155454.rgb.jpg/600x600bb.jpg', rating: '9.6', note: '迷幻合成器与复古贝斯线交织，像在紫色的流体里游泳。' },
-        { title: '万能青年旅店', creator: '万能青年旅店', year: '2010', era: '2026', color: '#aba158', accent: '#1d1c16', cover: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Album_cover_of_Omnipotent_Youth_Society.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.9', note: '小号响起的那一刻，北方的工业烟囱与平原黄昏就扑面而来。' },
-        { title: 'Melodrama', creator: 'Lorde', year: '2017', era: '2026', color: '#183075', accent: '#f08b5c', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/58/11/b1/5811b172-e180-25a6-69e6-4385fbbfb5dc/17UM1IM02207.rgb.jpg/600x600bb.jpg', rating: '9.5', note: '把一场派对散场后的孤独写成了浓烈的蓝色油画。' },
-        { title: 'Discovery', creator: 'Daft Punk', year: '2001', era: '2026', color: '#0c0d12', accent: '#7cd4ff', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fd/4a/77/fd4a77db-0ebc-d043-41a2-f32fa1bb0fb4/dj.qrikkdwj.jpg/600x600bb.jpg', rating: '9.7', note: '法式浩室与采样艺术的教科书，Digital Love 的尾奏百听不腻。' },
-        { title: '浮躁', creator: '王菲', year: '1996', era: '2026', color: '#f1dce0', accent: '#6b3e47', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/f6/31/d6/f631d6d6-1fd0-272a-3feb-de30b4e69ace/00602517665095.rgb.jpg/600x600bb.jpg', rating: '9.6', note: '最自由灵动的一张唱片，几乎没有歌词的吟唱却装满了夏天。' },
-        { title: 'IGOR', creator: 'Tyler, The Creator', year: '2019', era: '2026', color: '#f2a9c0', accent: '#181617', cover: 'https://upload.wikimedia.org/wikipedia/en/5/51/Igor_-_Tyler%2C_the_Creator.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.4', note: '粗粝失真合成器与灵魂乐和声的奇妙碰撞。' },
-        { title: '冀西南林路行', creator: '万能青年旅店', year: '2020', era: 'all', color: '#756d61', accent: '#f3efe6', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/c5/bd/a6/c5bda6ad-0ed6-849d-dc07-c6b527c0b5aa/cover.jpg/600x600bb.jpg', rating: '9.7', note: '十年磨一剑，管弦与摇滚交织出的山河长卷。' },
-        { title: 'Channel Orange', creator: 'Frank Ocean', year: '2012', era: 'all', color: '#e66e22', accent: '#ffffff', cover: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Channel_ORANGE.jpg/330px-Channel_ORANGE.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail', rating: '9.5', note: 'Pyramids 的十分钟叙事转场至今无人能及。' },
-        { title: 'OK Computer', creator: 'Radiohead', year: '1997', era: 'all', color: '#e2ebf2', accent: '#1e3a5f', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/60/ba/0760ba0f-148c-b18f-d0ff-169ee96f3af5/634904078164.png/600x600bb.jpg', rating: '9.9', note: '二十多年前写下的现代人疏离感预言。' },
-        { title: 'After Hours', creator: 'The Weeknd', year: '2020', era: 'all', color: '#1f0d0c', accent: '#e8b968', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2b/b9/fe/2bb9fef5-d7f3-8345-25a9-db0e79fde4e4/20UMGIM11048.rgb.jpg/600x600bb.jpg', rating: '9.3', note: '午夜霓虹都市的复古合成器浪潮。' },
+        {
+          title: '万能青年旅店',
+          creator: '万能青年旅店',
+          year: '2010',
+          formats: ['cd'],
+          edition: '实体 CD',
+          color: '#aba158',
+          accent: '#1d1c16',
+          cover: './covers/oys-self-titled.jpg',
+          rating: '10.0',
+          note: '小号响起的那一刻，北方的工业烟囱与平原黄昏就扑面而来。',
+        },
+        {
+          title: '冀西南林路行',
+          creator: '万能青年旅店',
+          year: '2020',
+          formats: ['cd'],
+          edition: '实体 CD · 郊眠寺',
+          color: '#685f54',
+          accent: '#e8e2d5',
+          cover: './covers/oys-cable-temple.jpg',
+          rating: '9.9',
+          note: '十年磨一剑，石刻拓片与管弦摇滚交织出的太行山河长卷。',
+        },
+        {
+          title: 'Best Selection 2004~2018 (Vol.1)',
+          creator: '李志',
+          year: '2019',
+          formats: ['cd'],
+          edition: 'PANDA RECORD 日版 2CD · BRANCD-005/006',
+          color: '#f2efe8',
+          accent: '#b91c1c',
+          cover: './covers/lizhi-best-vol1.jpg',
+          rating: '9.9',
+          note: '日版精选第一辑，收录录音室版与现场版双碟对照，《天空之城》《关于郑州的记忆》百听不厌。',
+        },
+        {
+          title: '叙事歌 · Best Selection Vol.2',
+          creator: '李志',
+          year: '2020',
+          formats: ['cd'],
+          edition: 'PANDA RECORD 日版 2CD · BRANCD-011/012',
+          color: '#8f816a',
+          accent: '#f0dfba',
+          cover: './covers/lizhi-best-vol2.jpg',
+          rating: '9.8',
+          note: 'Ballads 叙事歌辑，把《被禁忌的游戏》《梵高先生》《热河》装进温暖泛黄的旧时光里。',
+        },
+        {
+          title: '倒影 · Best Selection Vol.3',
+          creator: '李志',
+          year: '2021',
+          formats: ['cd'],
+          edition: 'PANDA RECORD 日版 2CD · BRANCD-023/024',
+          color: '#e5e3db',
+          accent: '#b82a2a',
+          cover: './covers/lizhi-best-vol3.jpg',
+          rating: '9.8',
+          note: 'Reflection 倒影辑，水墨封套配日版侧标，收录《卡夫卡》《董卓瑶》《定西》《倒影》。',
+        },
+        {
+          title: '叁缺壹·东京演唱会 (2024)',
+          creator: '李志',
+          year: '2025',
+          formats: ['cd'],
+          edition: 'PANDA RECORD 日版 2CD · BRANCD-061/062',
+          color: '#101012',
+          accent: '#e5e5e5',
+          cover: './covers/lizhi-tokyo-2024.png',
+          rating: '9.9',
+          note: '2024 年 5 月 2 日东京花园剧场实况全记录，克制而滚烫的重逢之夜。',
+        },
+        {
+          title: '叁缺壹·吉隆坡现场 (2025)',
+          creator: '李志',
+          year: '2026',
+          formats: ['cd'],
+          edition: '实体 CD · 2025.11.11-13 吉隆坡站现场录音精选 11 曲',
+          color: '#6b0f14',
+          accent: '#f5d0d2',
+          cover: './covers/lizhi-kl-2025.jpg',
+          rating: '9.9',
+          note: '2025 年 11 月吉隆坡站全新乐队编制现场实录，11 首重新编曲的呼吸与现场张力被完整留存。',
+        },
+        {
+          title: 'The Dark Side of the Moon',
+          creator: 'Pink Floyd',
+          year: '1973',
+          formats: ['cd'],
+          edition: '实体 CD · 月之暗面',
+          color: '#0c0c0e',
+          accent: '#e8432d',
+          cover: './covers/pink-floyd-dsotm.jpg',
+          rating: '10.0',
+          note: '三棱镜折射出时间、金钱、疯狂与月食，概念专辑史上永恒的灯塔。',
+        },
+        {
+          title: 'Wish You Were Here',
+          creator: 'Pink Floyd',
+          year: '1975',
+          formats: ['cd'],
+          edition: '实体 CD · 愿你在此',
+          color: '#efeee9',
+          accent: '#e06c28',
+          cover: './covers/pink-floyd-wywh.jpg',
+          rating: '10.0',
+          note: 'Shine On You Crazy Diamond 的合成器铺陈响起时，所有思念都有了重量。',
+        },
+        {
+          title: '寸鐵 aLIVE IN CHINA 2017-2023',
+          creator: '寸铁',
+          year: '2024',
+          formats: ['cd'],
+          edition: '3CD 限量现场盒装 · 局部娱乐',
+          color: '#b8b7b3',
+          accent: '#141414',
+          cover: './covers/cuntie-alive-in-china.jpg',
+          rating: '9.9',
+          note: '七年现场声景的精密存档，粗粝压纹盒装里藏着最锋利也最克制的中文摇滚现场。',
+        },
+        {
+          title: "24' 相见恨晚",
+          creator: '腰乐队',
+          year: '2024',
+          formats: ['white-vinyl'],
+          edition: '2024 再版 10寸白胶 LP · 局部娱乐（原版 2014）',
+          color: '#ebe9e4',
+          accent: '#9a968c',
+          cover: './covers/yao-xiangjianhenwan-24.jpg',
+          rating: '10.0',
+          note: '纯白压纹封套配温润白胶，十年后再读《晚春》《一个短篇》，依然相见恨晚。',
+        },
+        {
+          title: '我在三月的早晨看到了七月的黄昏',
+          creator: '南青乐队',
+          year: '2020',
+          formats: ['cd'],
+          edition: '实体 CD · 北京东方影音',
+          color: '#4e5d52',
+          accent: '#e38b29',
+          cover: './covers/nanqing-march-morning.jpg',
+          rating: '9.7',
+          note: '粗粝油渍吉他与潮湿南方黄昏的气息，像在冷绿色走廊尽头忽然撞见一片滚烫橘红。',
+        },
+      ],
+    },
+
+    tickets: {
+      label: 'Tickets',
+      cnLabel: '演出票根',
+      filterMode: 'year',
+      defaultLook: 'stubs',
+      looks: [
+        { id: 'stubs', label: '票根墙' },
+        { id: 'timeline', label: '观演志' },
+        { id: 'wall', label: '实拍墙' },
+      ],
+      items: [
+        {
+          title: '叁缺壹 JAPAN Tour 2024 · 东京站',
+          creator: '李志',
+          date: '2024.05.02',
+          year: '2024',
+          city: '东京 Tokyo',
+          venue: 'Tokyo Garden Theater',
+          seat: 'ARENA · 指定席',
+          price: '¥12,000',
+          serial: 'TYO-0502-A',
+          color: '#19191b',
+          accent: '#d97706',
+          cover: './covers/lizhi-tokyo-2024.png',
+          isSample: true,
+          note: '示例票根：可在 shelf.config.js 的 tickets 替换为你实际看过的场次，也可在 photo 字段填实拍票根图路径。',
+        },
+        {
+          title: '冀西南林路行 · 剧场巡演专场',
+          creator: '万能青年旅店',
+          date: '2023.11.18',
+          year: '2023',
+          city: '上海 Shanghai',
+          venue: '保利大剧院 / 专场',
+          seat: '池座 · 06排',
+          price: '¥480',
+          serial: 'OYS-1118-06',
+          color: '#e9e3d3',
+          accent: '#8a5a2b',
+          cover: './covers/oys-cable-temple.jpg',
+          isSample: true,
+          note: '示例票根：小号与大提琴在剧场穹顶下回荡的那一刻，值得把这张纸质票留一辈子。',
+        },
+        {
+          title: '寸鐵 LIVE · 现场专场',
+          creator: '寸铁',
+          date: '2023.08.12',
+          year: '2023',
+          city: '北京 Beijing',
+          venue: '疆进酒 · OMNI SPACE',
+          seat: '预售站席 · GA',
+          price: '¥220',
+          serial: 'CT-0812-GA',
+          color: '#dedcd6',
+          accent: '#b91c1c',
+          cover: './covers/cuntie-alive-in-china.jpg',
+          isSample: true,
+          note: '示例票根：站在调音台旁听完一整场不插废话的密集编排，散场后耳朵嗡嗡响了一整晚。',
+        },
       ],
     },
 
@@ -59,7 +266,7 @@ window.SHELF_CONFIG = Object.freeze({
       items: [
         { title: 'Instant Crush', creator: 'Daft Punk ft. Julian Casablancas', year: '2013', era: '2026', color: '#1f2937', accent: '#f59e0b', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg', rating: '10.0', note: '声码器人声与合成器主音最浪漫的一次交汇。' },
         { title: 'Weird Fishes / Arpeggi', creator: 'Radiohead', year: '2007', era: '2026', color: '#1c242b', accent: '#38bdf8', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/dd/50/c7/dd50c790-99ac-d3d0-5ab8-e3891fb8fd52/634904032463.png/600x600bb.jpg', rating: '9.9', note: '层层叠加的吉他琶音像潜入深海又浮出水面。' },
-        { title: '杀死那个石家庄人', creator: '万能青年旅店', year: '2010', era: '2026', color: '#3b3024', accent: '#d97706', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/62/43/86/6243868c-c362-74d0-68d5-1de5e89986ee/cover.jpg/600x600bb.jpg', rating: '10.0', note: '平静叙事下的巨大暗流。' },
+        { title: '杀死那个石家庄人', creator: '万能青年旅店', year: '2010', era: '2026', color: '#3b3024', accent: '#d97706', cover: './covers/oys-self-titled.jpg', rating: '10.0', note: '平静叙事下的巨大暗流。' },
         { title: 'Self Control', creator: 'Frank Ocean', year: '2016', era: '2026', color: '#284b3c', accent: '#fde68a', cover: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.jpeg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.8', note: '尾段多重人声合唱每次听都会起鸡皮疙瘩。' },
         { title: 'Let It Happen', creator: 'Tame Impala', year: '2015', era: '2026', color: '#3b1c54', accent: '#f43f5e', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a8/2e/b4/a82eb490-f30a-a321-461a-0383c88fec95/15UMGIM23316.rgb.jpg/600x600bb.jpg', rating: '9.7', note: '七分多钟的迷幻旅程，中段卡碟循环的处理神来之笔。' },
         { title: '以父之名', creator: '周杰伦', year: '2003', era: '2026', color: '#451a1c', accent: '#d4af37', cover: 'https://upload.wikimedia.org/wikipedia/en/3/30/Yehuimei.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.9', note: '歌剧女高音与古典弦乐切入嘻哈节拍的经典时刻。' },
@@ -67,7 +274,7 @@ window.SHELF_CONFIG = Object.freeze({
         { title: 'Ribs', creator: 'Lorde', year: '2013', era: '2026', color: '#172554', accent: '#93c5fd', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/96/a5/09/96a50916-169b-724c-b722-b8c474406352/13UAAIM68691.rgb.jpg/600x600bb.jpg', rating: '9.5', note: '渐强的环境音墙把成长的焦虑与怀念推向顶点。' },
         { title: 'Space Song', creator: 'Beach House', year: '2015', era: '2026', color: '#31102f', accent: '#fbcfe8', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/09/e0/d5/09e0d559-0682-f0f0-5e0c-3cd11e3114fd/beachhouse_depressioncherry_2400_300.jpg/600x600bb.jpg', rating: '9.6', note: '滑棒吉他一响就像漂浮在失重的星云里。' },
         { title: '晴天', creator: '周杰伦', year: '2003', era: '2026', color: '#1e3a5f', accent: '#bae6fd', cover: 'https://upload.wikimedia.org/wikipedia/en/3/30/Yehuimei.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled', rating: '9.8', note: '前奏的木吉他拨弦是多少人的青春开场白。' },
-        { title: '采石', creator: '万能青年旅店', year: '2020', era: 'all', color: '#273832', accent: '#a7f3d0', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/c5/bd/a6/c5bda6ad-0ed6-849d-dc07-c6b527c0b5aa/cover.jpg/600x600bb.jpg', rating: '9.7', note: '自由爵士与摇滚乐的铿锵对话。' },
+        { title: '采石', creator: '万能青年旅店', year: '2020', era: 'all', color: '#273832', accent: '#a7f3d0', cover: './covers/oys-cable-temple.jpg', rating: '9.7', note: '自由爵士与摇滚乐的铿锵对话。' },
         { title: 'Veridis Quo', creator: 'Daft Punk', year: '2001', era: 'all', color: '#231f38', accent: '#fcd34d', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fd/4a/77/fd4a77db-0ebc-d043-41a2-f32fa1bb0fb4/dj.qrikkdwj.jpg/600x600bb.jpg', rating: '9.7', note: '极简巴洛克式电子旋律，适合独自思考的夜晚。' },
       ],
     },

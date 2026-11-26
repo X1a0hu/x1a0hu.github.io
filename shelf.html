@@ -4,19 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" id="meta-theme-color" />
-    <meta name="description" content="HULAB 的书影音，记录读过的书、看过的电影和剧、听过的专辑和歌。" />
+    <meta name="description" content="HULAB 的书影音与实体唱片架，收纳真实拥有的 CD、黑胶、白胶、演出票根，以及读过的书和看过的影视。" />
     <meta property="og:title" content="书影音 · HULAB" />
-    <meta property="og:description" content="读过的书，看过的电影和剧，听过的专辑和歌。" />
+    <meta property="og:description" content="实体唱片（CD / 黑胶 / 白胶）、演出票根、书与影视收藏架。" />
     <meta property="og:type" content="website" />
     <title>书影音 · HULAB</title>
     <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&family=Space+Grotesk:wght@500;700&display=swap" />
-    <link rel="stylesheet" href="./shelf.css?v=hulab-4" />
+    <link rel="stylesheet" href="./shelf.css?v=hulab-5" />
     <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./shelf.config.js?v=hulab-2"></script>
-    <script defer src="./shelf.js?v=hulab-3"></script>
+    <script defer src="./shelf.config.js?v=hulab-3"></script>
+    <script defer src="./shelf.js?v=hulab-4"></script>
   </head>
   <body>
     <div id="tfyi-bar">
@@ -32,8 +32,8 @@
         <div class="live" aria-label="馆藏作品总数">
           <canvas id="globe" width="88" height="88" aria-hidden="true"></canvas>
           <div class="live-meta">
-            <strong id="total-count">62</strong>
-            <span>部作品</span>
+            <strong id="total-count">0</strong>
+            <span>件馆藏</span>
           </div>
         </div>
       </header>
@@ -45,18 +45,15 @@
           <div class="shelf-controls">
             <div class="where-row">
               <div class="step-row">
-                <h2 class="step" id="shelf-heading">Albums</h2>
-                <span class="count-pill" id="category-count">14</span>
-                <div class="segmented" id="era-picker" role="group" aria-label="时间范围筛选">
-                  <button type="button" class="seg-btn is-active" data-era="all" aria-pressed="true">全部</button>
-                  <button type="button" class="seg-btn" data-era="2026" aria-pressed="false">2026</button>
-                </div>
+                <h2 class="step" id="shelf-heading">Albums · 实体唱片</h2>
+                <span class="count-pill" id="category-count">10</span>
+                <div class="segmented" id="era-picker" role="group" aria-label="载体或时间筛选"></div>
               </div>
 
               <div class="right-tools">
                 <div class="search-pill">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                  <input type="search" id="shelf-filter" placeholder="筛选作品或创作者..." aria-label="筛选当前分类作品" />
+                  <input type="search" id="shelf-filter" placeholder="筛选唱片、载体或场馆..." aria-label="筛选当前分类作品" />
                 </div>
 
                 <div class="opts">
@@ -77,7 +74,7 @@
 
           <div class="well">
             <div class="well-header">
-              <span class="well-label">Preview · Physical Shelf</span>
+              <span class="well-label" id="well-label">Preview · Physical Shelf</span>
               <button type="button" class="btn-secondary" id="download-png">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                 <span>Download PNG</span>
@@ -90,9 +87,9 @@
                 <div class="post-byline">
                   <div class="by-row">
                     <strong id="post-author">HULAB</strong>
-                    <span class="by-handle" id="post-handle">@X1a0hu · now</span>
+                    <span class="by-handle" id="post-handle">@X1a0hu · 实体收藏</span>
                   </div>
-                  <p class="post-caption" id="post-caption">专辑 · 14 项记录</p>
+                  <p class="post-caption" id="post-caption">实体唱片 · 10 项记录</p>
                 </div>
               </div>
 
@@ -104,11 +101,13 @@
               <div class="spotlight-body">
                 <div class="spotlight-top">
                   <span class="spotlight-rank" id="spotlight-rank">#01</span>
-                  <span class="spotlight-year" id="spotlight-year">2013</span>
+                  <span class="spotlight-year" id="spotlight-year">2010</span>
                   <span class="spotlight-rating" id="spotlight-rating">★ 10.0</span>
+                  <span class="spotlight-formats" id="spotlight-formats"></span>
                 </div>
-                <h3 class="spotlight-title" id="spotlight-title">Random Access Memories</h3>
-                <p class="spotlight-creator" id="spotlight-creator">Daft Punk</p>
+                <h3 class="spotlight-title" id="spotlight-title">万能青年旅店</h3>
+                <p class="spotlight-creator" id="spotlight-creator">万能青年旅店</p>
+                <p class="spotlight-edition" id="spotlight-edition" hidden></p>
                 <p class="spotlight-note" id="spotlight-note"></p>
               </div>
               <div class="spotlight-nav">
@@ -119,8 +118,8 @@
 
             <div class="index-drawer">
               <div class="index-header">
-                <span>Full Shelf Index · 点击任意条目定位并查看详情</span>
-                <span id="index-summary">Showing 14 items</span>
+                <span id="index-title">Full Shelf Index · 点击任意条目定位并查看详情</span>
+                <span id="index-summary">Showing 10 items</span>
               </div>
               <ol class="lines" id="titles"></ol>
             </div>
@@ -132,7 +131,7 @@
         <div class="tick">
           <span class="live-dot" aria-hidden="true"></span>
           <strong>Live</strong>
-          <span class="tick-text" id="tick-text">点击架上的任意 CD 侧脊、磁带、黑胶或书脊即可抽取出作品详情与短评</span>
+          <span class="tick-text" id="tick-text">点击架上的 CD 侧脊、黑胶/白胶唱片或演出票根，即可抽取查看版本详情与短评</span>
         </div>
         <a class="about-link" href="./">← 返回 HULAB 首页</a>
       </footer>

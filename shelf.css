@@ -195,10 +195,10 @@ button {
   color: var(--g500);
 }
 
-/* 5 大分类导航 Tabs（带微缩封面预览条） */
+/* 分类导航 Tabs（自适应 6 分类 + 微缩封面预览条） */
 .tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 6px;
   padding: 4px;
   margin-bottom: 12px;
@@ -267,6 +267,7 @@ button {
 }
 
 .mini-albums i { width: 16px; height: 16px; }
+.mini-tickets i { width: 15px; height: 11px; border-radius: 2px; }
 .mini-songs i { width: 10px; height: 18px; }
 .mini-movies i,
 .mini-tv i { width: 12px; height: 18px; }
@@ -962,7 +963,7 @@ button {
 .cd-text {
   flex: 1;
   width: 100%;
-  padding: 4px 0;
+  padding: 6px 0 4px;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   display: flex;
@@ -977,13 +978,16 @@ button {
   font-size: 11px;
   font-weight: 500;
   opacity: .86;
-  letter-spacing: .04em;
+  letter-spacing: .03em;
+  flex-shrink: 0;
 }
 
 .cd-title {
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: .02em;
+  letter-spacing: .01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cd-cat {
@@ -1761,6 +1765,695 @@ button {
   color: var(--ink);
 }
 
+/* ==========================================================================
+   实体载体徽章（CD / 黑胶 / 白胶）、白胶拟物材质与演出票根墙
+   ========================================================================== */
+
+.look-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: var(--pill);
+  background: var(--g200);
+  color: var(--g600);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.look-btn.is-active .look-count {
+  background: var(--g200);
+  color: var(--ink);
+}
+
+/* 载体徽章标签 */
+.format-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--pill);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.format-tag.is-compact {
+  padding: 1px 6px;
+  font-size: 9.5px;
+}
+
+.format-tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fmt-cd {
+  background: color-mix(in srgb, #94a3b8 18%, var(--bg));
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, #94a3b8 42%, transparent);
+}
+
+.fmt-cd::before {
+  background: conic-gradient(#e2e8f0, #93c5fd, #f9a8d4, #fde68a, #e2e8f0);
+}
+
+.fmt-black-vinyl {
+  background: #181816;
+  color: #f3f2ed;
+  border: 1px solid rgba(255, 255, 255, .18);
+}
+
+.fmt-black-vinyl::before {
+  background: radial-gradient(circle, #ffd60a 0 28%, #0a0a09 34% 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .28);
+}
+
+.fmt-white-vinyl {
+  background: #f5f3ec;
+  color: #1c1b18;
+  border: 1px solid rgba(25, 24, 22, .22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+
+.fmt-white-vinyl::before {
+  background: radial-gradient(circle, #8a8478 0 26%, #ffffff 32% 70%, #dcd8cd 100%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .2);
+}
+
+.fmt-color-vinyl {
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg));
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.fmt-color-vinyl::before {
+  background: var(--accent);
+}
+
+.fmt-tape {
+  background: color-mix(in srgb, #f59e0b 16%, var(--bg));
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, #f59e0b 40%, transparent);
+}
+
+.fmt-tape::before {
+  background: #f59e0b;
+}
+
+.fmt-ticket {
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg));
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+}
+
+.fmt-ticket::before {
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+.grid-formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.line-formats {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.spotlight-formats {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.spotlight-edition {
+  margin: 3px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--g500);
+}
+
+/* ==========================================================================
+   白胶拟物材质 (.vinyl-disc.is-white-vinyl / .spin-record.is-white-vinyl)
+   ========================================================================== */
+
+.vinyl-disc.is-white-vinyl {
+  background:
+    conic-gradient(
+      from 28deg,
+      rgba(255, 255, 255, .92) 0deg,
+      rgba(222, 218, 208, .55) 48deg,
+      rgba(255, 255, 255, .96) 115deg,
+      rgba(206, 201, 190, .58) 185deg,
+      rgba(255, 255, 255, .92) 250deg,
+      rgba(218, 214, 204, .56) 315deg,
+      rgba(255, 255, 255, .92) 360deg
+    ),
+    repeating-radial-gradient(
+      circle at center,
+      rgba(120, 115, 105, .13) 0 1px,
+      rgba(248, 246, 240, 0) 1px 3.2px
+    ),
+    radial-gradient(circle, #f8f7f3 0 60%, #e7e4dc 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, .9),
+    inset 0 0 0 6px rgba(155, 150, 140, .14),
+    inset 0 0 0 12px rgba(255, 255, 255, .55),
+    inset 0 0 0 18px rgba(135, 130, 120, .12),
+    inset 0 0 0 24px rgba(255, 255, 255, .42),
+    0 4px 14px rgba(0, 0, 0, .28),
+    0 0 0 1px rgba(120, 116, 108, .28);
+}
+
+.vinyl-disc.is-white-vinyl .vinyl-disc-label {
+  box-shadow:
+    0 0 0 2px rgba(185, 180, 170, .72),
+    0 0 0 3.5px rgba(255, 255, 255, .85);
+}
+
+.vinyl-disc.is-white-vinyl .vinyl-disc-label::after {
+  background: #2b2a27;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .75);
+}
+
+/* 唱机白胶旋转盘面 + 转速铭牌 + 唱臂 */
+.spin-record.is-white-vinyl {
+  background:
+    conic-gradient(
+      from 15deg,
+      rgba(255, 255, 255, .95) 0deg,
+      rgba(214, 210, 200, .62) 55deg,
+      rgba(255, 255, 255, .98) 128deg,
+      rgba(198, 193, 182, .64) 205deg,
+      rgba(255, 255, 255, .94) 280deg,
+      rgba(218, 214, 204, .6) 330deg,
+      rgba(255, 255, 255, .95) 360deg
+    ),
+    repeating-radial-gradient(
+      circle at center,
+      rgba(110, 105, 96, .15) 0 1px,
+      rgba(248, 246, 240, 0) 1px 3.5px
+    ),
+    radial-gradient(circle, #faf9f5 0 65%, #e4e1d8 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, .92),
+    inset 0 0 0 12px rgba(145, 140, 130, .14),
+    inset 0 0 0 24px rgba(255, 255, 255, .52),
+    inset 0 0 0 36px rgba(135, 130, 120, .13),
+    0 12px 28px rgba(0, 0, 0, .32),
+    0 0 0 1px rgba(130, 126, 118, .3);
+}
+
+.spin-record.is-white-vinyl .spin-label {
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, .75),
+    0 0 0 2px rgba(140, 135, 126, .35);
+}
+
+.spin-spec-badge {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  z-index: 4;
+  padding: 3px 9px;
+  border-radius: var(--pill);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+.spin-spec-badge.is-black {
+  background: #181816;
+  color: #f3f2ed;
+  border: 1px solid rgba(255, 255, 255, .18);
+}
+
+.spin-spec-badge.is-white {
+  background: #f5f3ec;
+  color: #191816;
+  border: 1px solid rgba(25, 24, 22, .24);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
+}
+
+.spin-tonearm {
+  position: absolute;
+  right: max(6px, calc(50% - 148px));
+  top: 22px;
+  width: 24px;
+  height: 118px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.spin-tonearm::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d4d3cd, #5a5955 72%, #2b2a27);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .35);
+}
+
+.spin-tonearm::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 9px;
+  width: 3px;
+  height: 92px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #b8b6af, #f2f1ec 50%, #74726b);
+  transform-origin: top center;
+  transform: rotate(19deg);
+  box-shadow: 1px 3px 6px rgba(0, 0, 0, .28);
+}
+
+.spin-thumb-dot {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .55);
+}
+
+.spin-thumb-dot.is-black {
+  background: radial-gradient(circle, #ffd60a 0 28%, #111111 34% 100%);
+  border: 1px solid rgba(255, 255, 255, .45);
+}
+
+.spin-thumb-dot.is-white {
+  background: radial-gradient(circle, #7a766d 0 26%, #faf9f5 34% 100%);
+  border: 1px solid rgba(0, 0, 0, .35);
+}
+
+/* ==========================================================================
+   演出票根墙 (Tickets: Stubs / Timeline / Wall)
+   ========================================================================== */
+
+.tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
+  padding: 8px 4px;
+}
+
+.ticket-stub {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 86px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--ticket-paper, #e9e3d3);
+  color: var(--ticket-ink, #191816);
+  text-align: left;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(128, 124, 114, .28),
+    0 8px 22px rgba(0, 0, 0, .18);
+  transition: transform .22s cubic-bezier(.22, 1, .36, 1), box-shadow .22s;
+}
+
+.ticket-stub::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .18) 0%, transparent 45%, rgba(0, 0, 0, .06) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ticket-stub:hover {
+  transform: translateY(-4px) rotate(-.35deg);
+  box-shadow:
+    inset 0 0 0 1px rgba(128, 124, 114, .36),
+    0 14px 28px rgba(0, 0, 0, .24);
+}
+
+.ticket-stub.is-selected {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 2px;
+  transform: translateY(-3px);
+}
+
+.ticket-main {
+  position: relative;
+  z-index: 2;
+  padding: 14px 16px 13px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 11px;
+  min-width: 0;
+}
+
+.ticket-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ticket-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticket-sample-pill {
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px dashed currentColor;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  opacity: .72;
+  flex-shrink: 0;
+}
+
+.ticket-sample-pill.is-inline {
+  color: var(--g500);
+  border-color: var(--g400);
+}
+
+.ticket-body-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ticket-mini-art {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
+}
+
+.ticket-mini-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ticket-heading {
+  min-width: 0;
+  flex: 1;
+}
+
+.ticket-artist {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--ticket-accent, #d97706);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.ticket-title {
+  margin: 5px 0 0;
+  font-family: "Noto Serif SC", var(--font-sans);
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.28;
+  color: inherit;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ticket-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 9px;
+  border-top: 1px dotted color-mix(in srgb, currentColor 32%, transparent);
+}
+
+.ticket-meta-cell {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ticket-meta-k {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: .1em;
+  opacity: .58;
+}
+
+.ticket-meta-v {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 实拍实体票根照片模式 */
+.ticket-photo-wrap {
+  position: relative;
+  margin: -14px -16px -13px;
+  height: 100%;
+  min-height: 154px;
+  overflow: hidden;
+}
+
+.ticket-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ticket-photo-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 6px 10px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, .78));
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* 右侧可撕副券（带上下半圆撕口 + 虚线撕裂线 + 条形码） */
+.ticket-tear {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 12px 8px;
+  border-left: 1.5px dashed color-mix(in srgb, currentColor 34%, transparent);
+  background: color-mix(in srgb, var(--ticket-accent, #d97706) 11%, transparent);
+}
+
+.ticket-tear::before,
+.ticket-tear::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--g300) 75%, transparent);
+}
+
+.ticket-tear::before { top: -8px; }
+.ticket-tear::after { bottom: -8px; }
+
+.ticket-date-vert {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  opacity: .8;
+  white-space: nowrap;
+}
+
+.ticket-barcode {
+  width: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+
+.ticket-barcode span {
+  display: block;
+  width: 100%;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.ticket-serial {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  opacity: .72;
+  white-space: nowrap;
+}
+
+/* 观演志 Timeline */
+.ticket-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 4px;
+}
+
+.timeline-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 14px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-m);
+  border: 1px solid var(--g200);
+  background: var(--well);
+  text-align: left;
+  transition: transform .18s, border-color .18s, box-shadow .18s;
+}
+
+.timeline-row:hover,
+.timeline-row.is-selected {
+  transform: translateY(-2px);
+  border-color: var(--g400);
+  box-shadow: var(--raise);
+}
+
+.timeline-row.is-selected {
+  border-color: var(--accent);
+}
+
+.timeline-date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--quiet);
+  padding-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--surface);
+}
+
+.timeline-body {
+  min-width: 0;
+}
+
+.timeline-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.timeline-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.timeline-artist {
+  padding: 1px 7px;
+  border-radius: var(--pill);
+  background: var(--g200);
+  color: var(--quiet);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.timeline-place {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--g500);
+}
+
+.timeline-note {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--g600);
+}
+
+/* 实拍票面画廊 */
+.media-grid.is-ticket-wall {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.art-wrap.is-ticket-card {
+  aspect-ratio: 4 / 3;
+}
+
+.ticket-wall-badge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2;
+  padding: 2px 7px;
+  border-radius: var(--pill);
+  background: rgba(14, 14, 16, .78);
+  color: #f3f2ed;
+  backdrop-filter: blur(6px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+
 /* 响应式移动端适配 */
 @media (max-width: 820px) {
   .tabs {
@@ -1789,6 +2482,32 @@ button {
 @media (max-width: 600px) {
   .wrap {
     padding: 0 14px 20px;
+  }
+
+  .tickets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-stub {
+    grid-template-columns: minmax(0, 1fr) 74px;
+  }
+
+  .timeline-row {
+    grid-template-columns: 12px minmax(0, 1fr);
+    gap: 6px 10px;
+  }
+
+  .timeline-date {
+    grid-column: 2;
+    padding-top: 0;
+  }
+
+  .timeline-dot {
+    grid-row: 1 / span 2;
+  }
+
+  .spin-tonearm {
+    display: none;
   }
 
   .live {
