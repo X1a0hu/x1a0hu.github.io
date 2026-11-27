@@ -635,14 +635,14 @@ button {
   justify-content: center;
 }
 
-/* 多层排架：1:1 复刻 taylor.fyi/top/ 紧致实体唱片架 / 书架质感 */
+/* 多层排架：复刻源站干净排布，支持 10 条、20 条、50+ 条自动折行 */
 .shelf-rack {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-end;
-  gap: 18px 3px;
-  padding: 18px 8px 14px;
+  gap: 20px 10px;
+  padding: 14px 8px 10px;
 }
 
 /* 通用侧脊交互 */
@@ -654,65 +654,22 @@ button {
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
-  transition: transform .24s cubic-bezier(.22, 1, .36, 1), filter .24s;
+  transition: transform .22s cubic-bezier(.22, 1, .36, 1), filter .22s;
 }
 
 .spine-item:hover,
 .spine-item:focus-visible {
-  transform: translateY(-9px);
+  transform: translateY(-7px);
   z-index: 4;
 }
 
 .spine-item.is-selected {
-  transform: translateY(-12px);
+  transform: translateY(-9px);
   z-index: 5;
 }
 
 .spine-item.is-selected::after {
   box-shadow: 0 0 0 2px var(--accent);
-}
-
-/* 高清 Canvas 侧脊容器（CD 晶透盒 / 精装书脊 / DVD 塑膜盒） */
-.spine-canvas-item {
-  display: inline-flex;
-  align-items: flex-end;
-  border-radius: 5px;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, .24));
-}
-
-:root[data-theme="dark"] .spine-canvas-item {
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .58));
-}
-
-.spine-canvas-item:hover {
-  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, .34));
-}
-
-:root[data-theme="dark"] .spine-canvas-item:hover {
-  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .72));
-}
-
-.spine-canvas-item.is-selected {
-  filter:
-    drop-shadow(0 0 1.5px var(--accent))
-    drop-shadow(0 14px 22px rgba(0, 0, 0, .42));
-}
-
-.spine-canvas-item.is-selected::after {
-  box-shadow: none;
-}
-
-.spine-canvas {
-  display: block;
-  height: 356px;
-  width: auto;
-  border-radius: 4px;
-}
-
-@media (max-width: 600px) {
-  .spine-canvas {
-    height: 276px;
-  }
 }
 
 /* 展开在侧脊旁的真实专辑封面页 / 唱片正面封套（复刻 taylor.fyi CD + Cover 联动效果） */
