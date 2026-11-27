@@ -2070,14 +2070,16 @@ button {
 }
 
 /* ==========================================================================
-   演出票根墙 (Tickets: Stubs / Timeline / Wall)
+   演出票根墙 (Tickets: Bespoke Collector Ticket Cards / Timeline / Wall)
    ========================================================================== */
 
 .tickets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(430px, 1fr));
-  gap: 16px;
-  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px 4px;
 }
 
 /* 实拍票根图片卡片 (.ticket-art-card) */
@@ -2090,18 +2092,18 @@ button {
   border-radius: 14px;
   background: transparent;
   cursor: pointer;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, .28));
-  transition: transform .22s cubic-bezier(.22, 1, .36, 1), filter .22s;
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, .32));
+  transition: transform .24s cubic-bezier(.22, 1, .36, 1), filter .24s;
 }
 
 .ticket-art-card:hover {
-  transform: translateY(-4px) rotate(-.35deg);
-  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, .36));
+  transform: translateY(-4px) rotate(-.25deg);
+  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, .4));
 }
 
 .ticket-art-card.is-selected {
   transform: translateY(-3px);
-  filter: drop-shadow(0 0 2px var(--accent)) drop-shadow(0 12px 24px rgba(0, 0, 0, .34));
+  filter: drop-shadow(0 0 2px var(--accent)) drop-shadow(0 14px 26px rgba(0, 0, 0, .38));
 }
 
 .ticket-art-img {
@@ -2111,139 +2113,274 @@ button {
   border-radius: 12px;
 }
 
-/* 官方海报融合 · 极简档案实体演出票根 (.ticket-stub) */
-.ticket-stub {
+/* 典藏实体演出票通用骨架 (.ticket-card) */
+.ticket-card {
+  --tk-notch-bg: var(--surface);
+  --tk-ring: var(--accent);
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 82px;
-  min-height: 166px;
+  grid-template-columns: 232px minmax(0, 1fr) 106px;
+  min-height: 224px;
+  width: 100%;
   padding: 0;
   border: 0;
-  border-radius: 12px;
-  background: var(--well);
-  color: var(--ink);
+  border-radius: 14px;
   text-align: left;
   overflow: hidden;
-  box-shadow:
-    inset 0 0 0 1px var(--g200),
-    0 8px 24px rgba(0, 0, 0, .14);
-  transition: transform .22s cubic-bezier(.22, 1, .36, 1), box-shadow .22s;
+  cursor: pointer;
+  isolation: isolate;
+  transition: transform .26s cubic-bezier(.22, 1, .36, 1), box-shadow .26s;
 }
 
-.ticket-stub.has-poster {
-  grid-template-columns: 122px minmax(0, 1fr) 82px;
-}
-
-:root[data-theme="dark"] .ticket-stub {
-  background: linear-gradient(135deg, var(--ticket-bg, #161618) 0%, #121210 100%);
-  color: #f3f2ed;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, .1),
-    0 12px 28px rgba(0, 0, 0, .42);
-}
-
-.ticket-stub::before {
+/* 300gsm 美术纸微粒肌理层 */
+.ticket-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, rgba(255, 255, 255, .07) 0%, transparent 40%, rgba(0, 0, 0, .06) 100%);
+  z-index: 4;
   pointer-events: none;
-  z-index: 3;
+  opacity: .075;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
 }
 
-.ticket-stub:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--ticket-accent, var(--accent)) 55%, var(--g300)),
-    0 16px 32px rgba(0, 0, 0, .28);
-}
-
-.ticket-stub.is-selected {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  transform: translateY(-2px);
-}
-
-.ticket-poster-col {
-  position: relative;
-  overflow: hidden;
-  background: #0b0c0e;
-  border-right: 1px solid color-mix(in srgb, var(--ticket-accent, #888) 28%, rgba(128, 128, 128, .2));
-}
-
-.ticket-poster-col.is-framed {
-  display: grid;
-  place-items: center;
-  padding: 6px;
-}
-
-.ticket-poster-bg {
+/* 悬停金属箔扫光 */
+.ticket-card::before {
+  content: "";
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.24);
-  filter: blur(12px) saturate(1.25) brightness(.56);
+  z-index: 3;
   pointer-events: none;
-  z-index: 0;
+  background: linear-gradient(112deg, transparent 22%, rgba(255, 255, 255, .14) 44%, rgba(255, 255, 255, .04) 54%, transparent 72%);
+  transform: translateX(-35%);
+  opacity: .42;
+  transition: transform .65s cubic-bezier(.22, 1, .36, 1), opacity .35s;
 }
 
-.ticket-poster-img {
+.ticket-card:hover {
+  transform: translateY(-4px);
+}
+
+.ticket-card:hover::before {
+  transform: translateX(28%);
+  opacity: .85;
+}
+
+.ticket-card.is-selected {
+  outline: 2px solid var(--tk-ring);
+  outline-offset: 3px;
+}
+
+/* 左侧官方海报舞台 */
+.tk-art {
   position: relative;
+  overflow: hidden;
   z-index: 1;
+}
+
+.tk-art-img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
-  transition: transform .35s cubic-bezier(.22, 1, .36, 1);
+  transition: transform .48s cubic-bezier(.22, 1, .36, 1);
 }
 
-.ticket-poster-col.is-framed .ticket-poster-img {
-  height: auto;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: 4px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .48);
+.ticket-card:hover .tk-art-img {
+  transform: scale(1.04);
 }
 
-.ticket-stub:hover .ticket-poster-img {
-  transform: scale(1.05);
-}
-
-.ticket-main {
+/* 中部票面主信息区 */
+.tk-body {
   position: relative;
   z-index: 2;
-  padding: 13px 15px 12px;
+  padding: 18px 20px 16px 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
-.ticket-top-row {
+.tk-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
 }
 
-.ticket-eyebrow {
+.tk-kicker {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: .06em;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: var(--ticket-accent, var(--quiet));
-  opacity: .92;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-:root:not([data-theme="dark"]) .ticket-eyebrow {
-  color: color-mix(in srgb, var(--ticket-accent, var(--ink)) 72%, #111);
+.tk-hero {
+  min-width: 0;
+}
+
+.tk-artist {
+  margin: 0 0 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  opacity: .76;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tk-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.22;
+  color: inherit;
+  text-wrap: balance;
+  word-break: keep-all;
+}
+
+.tk-subline {
+  margin: 5px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  opacity: .8;
+}
+
+/* 票面底部参数格 */
+.tk-specs {
+  display: grid;
+  gap: 10px 14px;
+  padding-top: 10px;
+}
+
+.tk-specs-3 {
+  grid-template-columns: auto auto minmax(0, 1fr);
+}
+
+.tk-specs-2 {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.tk-spec {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tk-spec-k {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: .11em;
+  opacity: .56;
+  white-space: nowrap;
+}
+
+.tk-spec-v {
+  font-family: var(--font-mono), var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 右侧微孔撕口副券 + 高密度矢量条形码 */
+.tk-stub {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 15px 10px 14px 14px;
+}
+
+/* 真实打孔虚线撕裂槽 */
+.tk-stub::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  background-image: radial-gradient(circle, var(--tk-notch-bg) 1.55px, transparent 1.85px);
+  background-size: 4px 8.5px;
+  background-repeat: repeat-y;
+  z-index: 3;
+}
+
+/* 上下半圆撕纸缺口 */
+.tk-stub::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: -9px;
+  bottom: -9px;
+  width: 18px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 9px 9px, var(--tk-notch-bg) 8.5px, transparent 9px) top / 18px 18px no-repeat,
+    radial-gradient(circle at 9px 9px, var(--tk-notch-bg) 8.5px, transparent 9px) bottom / 18px 18px no-repeat;
+  z-index: 5;
+}
+
+.tk-stub-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.1;
+}
+
+.tk-stub-date {
+  font-family: "Space Grotesk", var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.tk-stub-day {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  opacity: .72;
+  white-space: nowrap;
+}
+
+.tk-barcode-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 102px;
+  opacity: .9;
+}
+
+.ticket-barcode-svg {
+  display: block;
+  width: 48px;
+  height: 98px;
+}
+
+.tk-serial {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  opacity: .74;
+  white-space: nowrap;
 }
 
 .ticket-sample-pill {
@@ -2262,131 +2399,489 @@ button {
   border-color: var(--g400);
 }
 
-.ticket-heading {
-  min-width: 0;
+/* ==========================================================================
+   1. 李志 · 2026叁缺壹吉隆坡站 — 跨海登机纪念票 (.tk-ocean)
+   ========================================================================== */
+.ticket-card.tk-ocean {
+  --tk-ring: #7dd3fc;
+  grid-template-columns: 238px minmax(0, 1fr) 108px;
+  background:
+    radial-gradient(circle at 82% 16%, rgba(186, 230, 253, .22) 0%, transparent 48%),
+    radial-gradient(circle at 38% 92%, rgba(56, 189, 248, .14) 0%, transparent 50%),
+    linear-gradient(112deg, #041325 0%, #092a4c 48%, #134a78 100%);
+  color: #f4f9ff;
+  box-shadow:
+    inset 0 0 0 1px rgba(147, 213, 252, .26),
+    0 14px 34px rgba(3, 15, 32, .48);
 }
 
-.ticket-artist-line {
-  margin: 0 0 4px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--quiet);
+.tk-ocean .tk-art {
+  -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 72%, transparent 100%);
+}
+
+.tk-ocean .tk-art-img {
+  object-position: center 48%;
+}
+
+.tk-ocean .tk-body {
+  padding-left: 4px;
+}
+
+/* 细虚线航迹与海面经纬感 */
+.tk-ocean .tk-body::before {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 46px;
+  width: 148px;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, rgba(186, 230, 253, .34) 0 4px, transparent 4px 8px);
+  transform: rotate(-13deg);
+  pointer-events: none;
+}
+
+.tk-ocean .tk-kicker {
+  color: #8fd3fc;
+}
+
+.tk-route-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(147, 213, 252, .14);
+  border: 1px solid rgba(186, 230, 253, .38);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  color: #e0f2fe;
+  flex-shrink: 0;
+}
+
+.tk-route-badge svg {
+  width: 11px;
+  height: 11px;
+  fill: #7dd3fc;
+}
+
+.tk-route-badge strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.tk-ocean .tk-title {
+  font-family: "Space Grotesk", "Noto Sans SC", var(--font-sans);
+  font-size: 21px;
+  letter-spacing: .04em;
+  text-shadow: 0 2px 12px rgba(4, 18, 36, .45);
+}
+
+.tk-ocean-en {
+  margin: 5px 0 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  color: rgba(186, 230, 253, .72);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-:root[data-theme="dark"] .ticket-artist-line {
-  color: rgba(243, 242, 237, .66);
+.tk-ocean .tk-specs {
+  border-top: 1px solid rgba(255, 255, 255, .24);
 }
 
-.ticket-title {
-  margin: 0;
-  font-family: "Noto Serif SC", var(--font-sans);
-  font-size: 14.5px;
-  font-weight: 700;
-  line-height: 1.34;
-  color: inherit;
-  text-wrap: balance;
-  word-break: keep-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.tk-ocean .tk-stub {
+  background: linear-gradient(180deg, rgba(147, 213, 252, .16) 0%, rgba(5, 22, 42, .46) 100%);
+  border-left: 1px solid rgba(186, 230, 253, .16);
 }
 
-.ticket-meta-grid {
+/* ==========================================================================
+   2. 岛屿心情 · 「美丽人生」上海站 — 虹彩全息烫印纪念票 (.tk-prism)
+   ========================================================================== */
+.ticket-card.tk-prism {
+  --tk-ring: #f6c7b2;
+  grid-template-columns: 204px minmax(0, 1fr) 112px;
+  background:
+    radial-gradient(circle at 72% 16%, rgba(251, 207, 232, .22) 0%, transparent 40%),
+    radial-gradient(circle at 38% 88%, rgba(165, 243, 252, .18) 0%, transparent 46%),
+    radial-gradient(circle at 86% 78%, rgba(253, 213, 177, .22) 0%, transparent 44%),
+    linear-gradient(126deg, #1a2430 0%, #2d3747 42%, #4e3f4a 76%, #242733 100%);
+  color: #fdf7f1;
+  box-shadow:
+    inset 0 0 0 1px rgba(250, 215, 200, .28),
+    0 14px 34px rgba(18, 16, 28, .48);
+}
+
+.tk-prism .tk-art {
+  -webkit-mask-image: linear-gradient(90deg, #000 68%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 68%, transparent 100%);
+}
+
+.tk-prism .tk-art-img {
+  object-position: center 46%;
+}
+
+.tk-prism .tk-body {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 12px;
+  padding: 18px 22px 16px 4px;
+}
+
+/* 呼应官方海报顶部的竖排「岛屿心情 ISLAND MOOD」字标 */
+.tk-vertical-credit {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Noto Serif SC", var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .24em;
+  color: rgba(253, 238, 226, .58);
+  border-right: 1px solid rgba(250, 215, 200, .18);
+  padding-right: 6px;
+}
+
+.tk-prism-inner {
+  position: relative;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-top: 8px;
-  border-top: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
-}
-
-.ticket-meta-cell {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
-  align-items: baseline;
+  justify-content: space-between;
   gap: 8px;
 }
 
-.ticket-meta-k {
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  letter-spacing: .08em;
-  opacity: .52;
-}
-
-.ticket-meta-v {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 右侧可撕副券（带上下半圆撕口 + 虚线撕裂线 + 极细条形码） */
-.ticket-tear {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 13px 8px;
-  border-left: 1.5px dashed color-mix(in srgb, currentColor 24%, transparent);
-  background: color-mix(in srgb, var(--ticket-accent, #888) 10%, transparent);
-}
-
-.ticket-tear::before,
-.ticket-tear::after {
+/* 呼应海报巨型虹彩气泡的柔和折射光环 */
+.tk-prism-inner::after {
   content: "";
   position: absolute;
-  left: -8px;
-  width: 15px;
-  height: 15px;
+  right: -28px;
+  top: 50%;
+  width: 148px;
+  height: 148px;
+  transform: translateY(-52%);
   border-radius: 50%;
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--g300) 75%, transparent);
+  background: radial-gradient(circle at 32% 32%, rgba(255, 255, 255, .1), rgba(249, 168, 212, .06) 48%, rgba(165, 243, 252, .08) 72%, transparent 74%);
+  box-shadow: inset 0 0 0 1px rgba(255, 232, 220, .16);
+  pointer-events: none;
 }
 
-.ticket-tear::before { top: -8px; }
-.ticket-tear::after { bottom: -8px; }
+.tk-prism .tk-kicker {
+  color: #f6c7b2;
+}
 
-.ticket-date-vert {
+.tk-foil-pill {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: linear-gradient(115deg, rgba(165, 243, 252, .22), rgba(249, 168, 212, .24), rgba(253, 230, 138, .24));
+  border: 1px solid rgba(255, 232, 220, .44);
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #fff8f2;
+}
+
+.tk-prism .tk-title {
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  background: linear-gradient(100deg, #ffffff 0%, #fce8d8 48%, #d7f3ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tk-prism .tk-subline {
+  color: rgba(253, 240, 230, .78);
+}
+
+.tk-prism .tk-specs {
+  position: relative;
+}
+
+.tk-prism .tk-specs::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(165, 243, 252, .56), rgba(249, 168, 212, .58), rgba(253, 224, 71, .45), transparent);
+}
+
+/* 真实演唱会纪念票的金属全息防伪激光竖条 */
+.tk-prism .tk-stub {
+  background:
+    linear-gradient(180deg, rgba(165, 243, 252, .58), rgba(249, 168, 212, .62), rgba(253, 224, 71, .56), rgba(196, 181, 253, .62), rgba(165, 243, 252, .58)) 6px 0 / 3.5px 100% no-repeat,
+    linear-gradient(180deg, rgba(246, 199, 178, .14) 0%, rgba(165, 216, 255, .1) 52%, rgba(22, 26, 38, .38) 100%);
+  padding-left: 17px;
+}
+
+/* ==========================================================================
+   3. 自然友谊 2024 · 上海站 — 荧光薄荷丝网独立印刷票 (.tk-mint)
+   ========================================================================== */
+.ticket-card.tk-mint {
+  --tk-ring: #7ef1d2;
+  grid-template-columns: 182px minmax(0, 1fr) 114px;
+  background:
+    radial-gradient(rgba(7, 9, 8, .085) .75px, transparent .75px) 0 0 / 7px 7px,
+    linear-gradient(135deg, #86f6d9 0%, #6cebc9 100%);
+  color: #080a09;
+  box-shadow:
+    inset 0 0 0 2px #080a09,
+    0 14px 32px rgba(0, 0, 0, .38);
+}
+
+.tk-mint .tk-art {
+  border-right: 2px solid #080a09;
+  background: #7ef1d2;
+}
+
+.tk-mint .tk-art-img {
+  object-position: center top;
+}
+
+.tk-mint .tk-body {
+  padding: 15px 18px 14px;
+  gap: 10px;
+}
+
+.tk-mint-head {
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #080a09;
+}
+
+.tk-mint-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tk-mint-logo {
+  font-family: "Space Grotesk", var(--font-sans);
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: #080a09;
+}
+
+.tk-mint-outline {
+  font-family: "Space Grotesk", var(--font-mono);
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: .06em;
-  opacity: .72;
+  color: transparent;
+  -webkit-text-stroke: 1px #080a09;
   white-space: nowrap;
 }
 
-.ticket-barcode {
-  width: 48px;
+.tk-mint-motto {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  background: #080a09;
+  color: #7ef1d2;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+/* 四支参演乐队独立色块标签 */
+.tk-lineup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tk-band-chip {
+  padding: 3px 8px;
+  border: 1.5px solid #080a09;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, .28);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #080a09;
+}
+
+/* 呼应官方海报的 SHOP 15:00-18:00 / LIVE 20:00 双时段格 */
+.tk-mint-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  padding-top: 8px;
+  border-top: 1.5px solid #080a09;
+}
+
+.tk-mint-grid .tk-spec.is-full {
+  grid-column: 1 / -1;
+  padding-top: 5px;
+  border-top: 1px dashed rgba(8, 10, 9, .35);
+}
+
+.tk-mint .tk-spec-k {
+  opacity: .72;
+  font-weight: 700;
+}
+
+.tk-mint .tk-spec-v {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* 呼应海报右下角黑底薄荷字「11/29 上海」方块 */
+.tk-mint .tk-stub {
+  background: #080a09;
+  color: #7ef1d2;
+}
+
+.tk-mint .tk-stub-date {
+  font-size: 20px;
+  letter-spacing: -.02em;
+  color: #7ef1d2;
+}
+
+.tk-mint .tk-stub-day {
+  color: #7ef1d2;
+  opacity: .88;
+}
+
+.tk-mint .tk-serial {
+  color: rgba(126, 241, 210, .86);
+  opacity: 1;
+}
+
+/* ==========================================================================
+   4. 南青乐队 · 「轻舟已过万重山」上海站 — 朱砂矿翠木刻版画典藏票 (.tk-woodblock)
+   ========================================================================== */
+.ticket-card.tk-woodblock {
+  --tk-ring: #38e0c5;
+  grid-template-columns: 256px minmax(0, 1fr) 104px;
+  background:
+    radial-gradient(circle at 80% 24%, rgba(56, 224, 197, .16) 0%, transparent 24%),
+    repeating-radial-gradient(
+      ellipse at 68% 122%,
+      rgba(12, 68, 55, .36) 0 1.2px,
+      transparent 1.2px 7.5px
+    ),
+    linear-gradient(125deg, #8a1d1f 0%, #b72d2d 50%, #75181a 100%);
+  color: #fdf5e6;
+  box-shadow:
+    inset 0 0 0 1px rgba(253, 245, 230, .24),
+    0 14px 34px rgba(34, 8, 9, .5);
+}
+
+/* 横版 4:3 木刻海报完整无裁切铺满左侧并柔和羽化入朱砂宣纸 */
+.tk-woodblock .tk-art {
+  -webkit-mask-image: linear-gradient(90deg, #000 84%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 84%, transparent 100%);
+}
+
+.tk-woodblock .tk-art-img {
+  object-position: center center;
+}
+
+.tk-woodblock .tk-body {
+  padding: 13px 16px 13px 4px;
+}
+
+/* 古典国风版画双套框 */
+.tk-wood-frame {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 4px 0;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 14px 10px;
+  border: 1px solid rgba(253, 245, 230, .34);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(64, 10, 12, .22), rgba(38, 6, 8, .32));
+  box-shadow: inset 0 0 0 3px rgba(183, 45, 45, .35), inset 0 0 0 4px rgba(253, 245, 230, .14);
+  min-width: 0;
 }
 
-.ticket-barcode span {
-  display: block;
-  width: 100%;
-  border-radius: 1px;
-  background: currentColor;
+.tk-woodblock .tk-kicker {
+  color: #7cf0da;
+  letter-spacing: .1em;
 }
 
-.ticket-serial {
-  font-family: var(--font-mono);
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  opacity: .68;
-  white-space: nowrap;
+.tk-seal-chop {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: #104e40;
+  border: 1px solid rgba(124, 240, 218, .62);
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: #fdf5e6;
+}
+
+.tk-woodblock .tk-artist {
+  color: rgba(253, 245, 230, .86);
+  opacity: 1;
+}
+
+.tk-woodblock .tk-title {
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #fffbf2;
+  text-shadow: 0 2px 10px rgba(45, 6, 8, .42);
+}
+
+.tk-woodblock .tk-specs {
+  border-top: 1px dashed rgba(253, 245, 230, .32);
+  padding-top: 7px;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
+.tk-woodblock .tk-spec {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.tk-woodblock .tk-spec-k {
+  min-width: 58px;
+  flex-shrink: 0;
+}
+
+.tk-woodblock .tk-spec-v {
+  font-size: 11px;
+}
+
+/* 矿翠深绿木刻副券 + 碧绿月轮点缀 */
+.tk-woodblock .tk-stub {
+  background:
+    radial-gradient(circle at 80% 14%, rgba(56, 224, 197, .24) 0%, transparent 32%),
+    linear-gradient(180deg, #125646 0%, #0b392f 100%);
+  color: #fdf5e6;
+}
+
+.tk-woodblock .tk-stub-date {
+  color: #7cf0da;
+  font-size: 17px;
+}
+
+.tk-woodblock .tk-stub-day {
+  color: rgba(253, 245, 230, .8);
+  opacity: 1;
 }
 
 /* 观演志 Timeline */
@@ -2555,16 +3050,82 @@ button {
     padding: 0 14px 20px;
   }
 
-  .tickets-grid {
+  .ticket-card,
+  .ticket-card.tk-ocean,
+  .ticket-card.tk-prism,
+  .ticket-card.tk-mint,
+  .ticket-card.tk-woodblock {
     grid-template-columns: 1fr;
+    min-height: 0;
   }
 
-  .ticket-stub {
-    grid-template-columns: minmax(0, 1fr) 72px;
+  .tk-art {
+    height: 185px;
+    -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%) !important;
+    mask-image: linear-gradient(180deg, #000 72%, transparent 100%) !important;
   }
 
-  .ticket-stub.has-poster {
-    grid-template-columns: 88px minmax(0, 1fr) 68px;
+  .tk-ocean .tk-art-img {
+    object-position: center 24%;
+  }
+
+  .tk-prism .tk-art-img {
+    object-position: center 42%;
+  }
+
+  .tk-mint .tk-art {
+    height: 210px;
+    border-right: 0;
+    border-bottom: 2px solid #080a09;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  .tk-body,
+  .tk-ocean .tk-body,
+  .tk-prism .tk-body,
+  .tk-woodblock .tk-body {
+    padding: 14px 16px;
+  }
+
+  .tk-stub,
+  .tk-prism .tk-stub {
+    flex-direction: row;
+    padding: 14px 16px 12px;
+  }
+
+  .tk-stub::before {
+    left: 14px;
+    right: 14px;
+    top: 0;
+    bottom: auto;
+    width: auto;
+    height: 4px;
+    background-size: 8.5px 4px;
+    background-repeat: repeat-x;
+  }
+
+  .tk-stub::after {
+    left: -9px;
+    right: -9px;
+    top: -8px;
+    bottom: auto;
+    width: auto;
+    height: 18px;
+    background:
+      radial-gradient(circle at 9px 9px, var(--tk-notch-bg) 8.5px, transparent 9px) left / 18px 18px no-repeat,
+      radial-gradient(circle at 9px 9px, var(--tk-notch-bg) 8.5px, transparent 9px) right / 18px 18px no-repeat;
+  }
+
+  .tk-barcode-wrap {
+    width: 94px;
+    height: 30px;
+  }
+
+  .ticket-barcode-svg {
+    width: 30px;
+    height: 94px;
+    transform: rotate(-90deg);
   }
 
   .timeline-row {

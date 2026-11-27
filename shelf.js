@@ -780,24 +780,65 @@
     return btn;
   }
 
-  // 构建确定性条形码（演出票根副券用）
+  // 构建高密度 Code-128 风格矢量条形码（真实锐利细密条纹，告别粗塑料块）
   function buildBarcode(seedStr) {
-    const wrap = document.createElement('div');
-    wrap.className = 'ticket-barcode';
-    wrap.setAttribute('aria-hidden', 'true');
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'ticket-barcode-svg');
+    svg.setAttribute('viewBox', '0 0 46 112');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('aria-hidden', 'true');
+
     let h = hashStr(seedStr || 'ticket');
-    for (let i = 0; i < 18; i++) {
-      h = Math.imul(h ^ (i + 7), 16777619) >>> 0;
-      const bar = document.createElement('span');
-      const w = (h % 3) + 1;
-      bar.style.height = `${w}px`;
-      bar.style.opacity = String(0.55 + ((h >> 3) % 4) * 0.12);
-      wrap.appendChild(bar);
+    let y = 2;
+    const widths = [1.2, 2.2, 1.0, 3.0, 1.4, 2.5];
+    const gaps = [1.1, 1.8, 1.2, 2.4, 1.3];
+
+    // 首尾保护条
+    const addBar = (top, thickness) => {
+      const r = document.createElementNS(svgNS, 'rect');
+      r.setAttribute('x', '0');
+      r.setAttribute('y', top.toFixed(1));
+      r.setAttribute('width', '46');
+      r.setAttribute('height', thickness.toFixed(1));
+      r.setAttribute('fill', 'currentColor');
+      r.setAttribute('shape-rendering', 'crispEdges');
+      svg.appendChild(r);
+    };
+
+    addBar(y, 1.6); y += 2.8;
+    addBar(y, 1.2); y += 2.6;
+
+    let i = 0;
+    while (y < 102) {
+      h = Math.imul(h ^ (i * 31 + 17), 16777619) >>> 0;
+      const barH = widths[h % widths.length];
+      const gapH = gaps[(h >>> 4) % gaps.length];
+      if (y + barH > 103) break;
+      addBar(y, barH);
+      y += barH + gapH;
+      i++;
     }
-    return wrap;
+
+    addBar(105.4, 1.2);
+    addBar(108.0, 1.8);
+    return svg;
   }
 
-  // 构建单个高质感实体演出票根（支持实拍票根图 photo，或官方海报融合编辑级实体票面）
+  function makeSpecCell(label, value, extraClass = '') {
+    const cell = document.createElement('div');
+    cell.className = `tk-spec${extraClass ? ` ${extraClass}` : ''}`;
+    const k = document.createElement('span');
+    k.className = 'tk-spec-k';
+    k.textContent = label;
+    const v = document.createElement('strong');
+    v.className = 'tk-spec-v';
+    v.textContent = value || '—';
+    cell.append(k, v);
+    return cell;
+  }
+
+  // 构建四套按官方海报深度定制布局与材质的典藏实体票根
   function buildTicketStub(item, index) {
     if (item.photo) {
       const btn = document.createElement('button');
@@ -819,88 +860,217 @@
       return btn;
     }
 
+    const theme = item.ticketTheme || 'ocean';
     const btn = document.createElement('button');
     btn.type = 'button';
-    const hasPoster = Boolean(item.cover);
-    btn.className = `ticket-stub${hasPoster ? ' has-poster' : ''}${index === activeItemIndex ? ' is-selected' : ''}`;
+    btn.className = `ticket-card tk-${theme}${index === activeItemIndex ? ' is-selected' : ''}`;
     btn.dataset.idx = String(index);
-    btn.style.setProperty('--ticket-bg', item.color || '#161618');
-    btn.style.setProperty('--ticket-accent', item.accent || '#ffd60a');
+    btn.style.setProperty('--tk-accent', item.accent || '#ffd60a');
     btn.setAttribute('aria-label', `${item.title} - ${item.creator} (${item.date || item.year || ''})`);
 
-    // 左侧：全出血真实官方演出海报面板（横版海报自动启用同源虚化衬底，完整保留书法字）
-    if (hasPoster) {
-      const posterCol = document.createElement('div');
-      posterCol.className = `ticket-poster-col${item.posterFramed ? ' is-framed' : ''}`;
-      if (item.posterFramed) {
-        const bg = createCoverImg(item, 'tickets', 'ticket-poster-bg', index < 6);
-        bg.setAttribute('aria-hidden', 'true');
-        posterCol.appendChild(bg);
-      }
-      posterCol.appendChild(createCoverImg(item, 'tickets', 'ticket-poster-img', index < 6));
-      btn.appendChild(posterCol);
+    // 1. 左侧全出血艺术海报舞台（根据每场海报比例做融合羽化或版画框）
+    const art = document.createElement('div');
+    art.className = 'tk-art';
+    if (item.cover) {
+      art.appendChild(createCoverImg(item, 'tickets', 'tk-art-img', index < 6));
     }
 
-    // 中部：极简档案纸质票面排版（使用站点高清 WebFont，无手绘图形）
-    const main = document.createElement('div');
-    main.className = 'ticket-main';
+    // 2. 中部：按每场演出的视觉语言构建专属实体票排版
+    const body = document.createElement('div');
+    body.className = 'tk-body';
 
-    const topRow = document.createElement('div');
-    topRow.className = 'ticket-top-row';
+    if (theme === 'ocean') {
+      // 【李志 · 跨海登机纪念票】
+      const head = document.createElement('div');
+      head.className = 'tk-head';
 
-    const eyebrow = document.createElement('span');
-    eyebrow.className = 'ticket-eyebrow';
-    eyebrow.textContent = item.subtitle || `${item.city || 'LIVE'} · ADMIT ONE`;
-    topRow.appendChild(eyebrow);
+      const kicker = document.createElement('span');
+      kicker.className = 'tk-kicker';
+      kicker.textContent = 'BOARDING PASS · FANTOPIA LIVE';
 
-    const heading = document.createElement('div');
-    heading.className = 'ticket-heading';
+      const route = document.createElement('span');
+      route.className = 'tk-route-badge';
+      route.innerHTML = '<span>LIVE</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 3 10.5l7.2 2.4L13.5 21 21 3Z"/></svg><strong>KUL</strong>';
 
-    const creator = document.createElement('p');
-    creator.className = 'ticket-artist-line';
-    creator.textContent = item.creator || '';
+      head.append(kicker, route);
 
-    const title = document.createElement('h3');
-    title.className = 'ticket-title';
-    title.textContent = item.title || '';
+      const hero = document.createElement('div');
+      hero.className = 'tk-hero';
 
-    heading.append(creator, title);
+      const artist = document.createElement('p');
+      artist.className = 'tk-artist';
+      artist.textContent = item.creator || '';
 
-    const metaGrid = document.createElement('div');
-    metaGrid.className = 'ticket-meta-grid';
-    [
-      { k: 'DATE', v: [item.date || item.year, item.time].filter(Boolean).join(' · ') || '—' },
-      { k: 'VENUE', v: item.venue || item.city || '—' },
-    ].forEach(pair => {
-      const cell = document.createElement('div');
-      cell.className = 'ticket-meta-cell';
-      const k = document.createElement('span');
-      k.className = 'ticket-meta-k';
-      k.textContent = pair.k;
-      const v = document.createElement('strong');
-      v.className = 'ticket-meta-v';
-      v.textContent = pair.v;
-      cell.append(k, v);
-      metaGrid.appendChild(cell);
-    });
+      const title = document.createElement('h3');
+      title.className = 'tk-title';
+      title.textContent = item.displayTitle || item.title || '';
 
-    main.append(topRow, heading, metaGrid);
+      const enSub = document.createElement('p');
+      enSub.className = 'tk-ocean-en';
+      enSub.textContent = item.subtitle || '';
 
-    // 右侧：打孔撕口 + 虚线副券 + 条形码
-    const tear = document.createElement('div');
-    tear.className = 'ticket-tear';
+      hero.append(artist, title, enSub);
 
-    const stubTop = document.createElement('span');
-    stubTop.className = 'ticket-date-vert';
-    stubTop.textContent = item.date || item.year || 'LIVE';
+      const specs = document.createElement('div');
+      specs.className = 'tk-specs tk-specs-3';
+      specs.append(
+        makeSpecCell('DATE', item.date || item.year),
+        makeSpecCell('SHOWTIME', item.time || '20:00'),
+        makeSpecCell('VENUE', item.venue || item.city, 'is-wide'),
+      );
+
+      body.append(head, hero, specs);
+    } else if (theme === 'prism') {
+      // 【岛屿心情 · 虹彩全息烫印纪念票】
+      const vRail = document.createElement('span');
+      vRail.className = 'tk-vertical-credit';
+      vRail.textContent = item.verticalTag || item.creator || '';
+      body.appendChild(vRail);
+
+      const inner = document.createElement('div');
+      inner.className = 'tk-prism-inner';
+
+      const head = document.createElement('div');
+      head.className = 'tk-head';
+
+      const kicker = document.createElement('span');
+      kicker.className = 'tk-kicker';
+      kicker.textContent = item.subtitle || '2026 NATIONAL TOUR';
+
+      const foilTag = document.createElement('span');
+      foilTag.className = 'tk-foil-pill';
+      foilTag.textContent = 'SHANGHAI · 04/17';
+
+      head.append(kicker, foilTag);
+
+      const hero = document.createElement('div');
+      hero.className = 'tk-hero';
+
+      const title = document.createElement('h3');
+      title.className = 'tk-title';
+      title.textContent = item.displayTitle || item.title || '';
+
+      const sub = document.createElement('p');
+      sub.className = 'tk-subline';
+      sub.textContent = item.displaySub || '';
+
+      hero.append(title, sub);
+
+      const specs = document.createElement('div');
+      specs.className = 'tk-specs tk-specs-3';
+      specs.append(
+        makeSpecCell('DATE', `${item.date || ''} FRI`),
+        makeSpecCell('TIME', '20:00'),
+        makeSpecCell('VENUE', item.venue || item.city, 'is-wide'),
+      );
+
+      inner.append(head, hero, specs);
+      body.appendChild(inner);
+    } else if (theme === 'mint') {
+      // 【自然友谊 2024 · 荧光薄荷丝网独立印刷票】
+      const head = document.createElement('div');
+      head.className = 'tk-head tk-mint-head';
+
+      const brandWrap = document.createElement('div');
+      brandWrap.className = 'tk-mint-brand';
+      const big = document.createElement('strong');
+      big.className = 'tk-mint-logo';
+      big.textContent = item.displayTitle || 'NF2024';
+      const outline = document.createElement('span');
+      outline.className = 'tk-mint-outline';
+      outline.textContent = 'LIVE & SHOP';
+      brandWrap.append(big, outline);
+
+      const motto = document.createElement('span');
+      motto.className = 'tk-mint-motto';
+      motto.textContent = '自然而然 · 友谊第一';
+
+      head.append(brandWrap, motto);
+
+      const lineupWrap = document.createElement('div');
+      lineupWrap.className = 'tk-lineup';
+      const bands = Array.isArray(item.lineup) ? item.lineup : String(item.creator || '').split('/').map(s => s.trim()).filter(Boolean);
+      bands.forEach(name => {
+        const pill = document.createElement('span');
+        pill.className = 'tk-band-chip';
+        pill.textContent = name;
+        lineupWrap.appendChild(pill);
+      });
+
+      const schedGrid = document.createElement('div');
+      schedGrid.className = 'tk-mint-grid';
+      const scheds = Array.isArray(item.schedule) ? item.schedule : [];
+      scheds.forEach(s => schedGrid.appendChild(makeSpecCell(s.k, s.v)));
+      schedGrid.appendChild(makeSpecCell('VENUE', item.venue || item.city, 'is-full'));
+
+      body.append(head, lineupWrap, schedGrid);
+    } else {
+      // 【南青乐队 · 朱砂矿翠木刻版画套框典藏票】
+      const frame = document.createElement('div');
+      frame.className = 'tk-wood-frame';
+
+      const head = document.createElement('div');
+      head.className = 'tk-head';
+
+      const kicker = document.createElement('span');
+      kicker.className = 'tk-kicker';
+      kicker.textContent = item.subtitle || '2024 TOUR';
+
+      const seal = document.createElement('span');
+      seal.className = 'tk-seal-chop';
+      seal.textContent = item.seal || '不插电';
+
+      head.append(kicker, seal);
+
+      const hero = document.createElement('div');
+      hero.className = 'tk-hero';
+
+      const artist = document.createElement('p');
+      artist.className = 'tk-artist';
+      artist.textContent = `${item.creator || ''} · ${item.displaySub || ''}`;
+
+      const title = document.createElement('h3');
+      title.className = 'tk-title';
+      title.textContent = item.displayTitle || item.title || '';
+
+      hero.append(artist, title);
+
+      const specs = document.createElement('div');
+      specs.className = 'tk-specs tk-specs-2';
+      specs.append(
+        makeSpecCell('日期 DATE', [item.date, item.time].filter(Boolean).join(' · ')),
+        makeSpecCell('场馆 VENUE', item.venue || item.city),
+      );
+
+      frame.append(head, hero, specs);
+      body.appendChild(frame);
+    }
+
+    // 3. 右侧：真实微孔撕裂线 + 专属副券 + 高密度矢量条形码
+    const stub = document.createElement('div');
+    stub.className = 'tk-stub';
+
+    const stubHead = document.createElement('div');
+    stubHead.className = 'tk-stub-head';
+    const stubDate = document.createElement('strong');
+    stubDate.className = 'tk-stub-date';
+    stubDate.textContent = item.stubDate || item.date || item.year || 'LIVE';
+    const stubDay = document.createElement('span');
+    stubDay.className = 'tk-stub-day';
+    stubDay.textContent = item.stubDay || item.cityCode || 'ADMIT';
+    stubHead.append(stubDate, stubDay);
+
+    const barcodeWrap = document.createElement('div');
+    barcodeWrap.className = 'tk-barcode-wrap';
+    barcodeWrap.appendChild(buildBarcode(`${item.title}-${item.date}-${item.serial}`));
 
     const serial = document.createElement('span');
-    serial.className = 'ticket-serial';
+    serial.className = 'tk-serial';
     serial.textContent = item.serial || `NO.${String(index + 1).padStart(4, '0')}`;
 
-    tear.append(stubTop, buildBarcode(`${item.title}-${item.date}-${item.serial}`), serial);
+    stub.append(stubHead, barcodeWrap, serial);
 
-    btn.append(main, tear);
+    btn.append(art, body, stub);
     btn.addEventListener('click', () => selectItem(index));
     btn.addEventListener('pointerenter', () => updateSpotlight(item, index));
     return btn;
@@ -1241,8 +1411,8 @@
         ratingEl.textContent = ticketMeta;
         ratingEl.hidden = !ticketMeta;
       } else {
-        ratingEl.textContent = item.rating ? `★ ${item.rating}` : '';
-        ratingEl.hidden = !item.rating;
+        ratingEl.textContent = '';
+        ratingEl.hidden = true;
       }
     }
 
