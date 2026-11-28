@@ -23,18 +23,19 @@
   };
 
   const siteName = siteConfig.name || 'HULAB';
-  const handle = shelfConfig.handle || '@X1a0hu';
-  const shelfTitle = shelfConfig.title || '书影音';
+  const handle = shelfConfig.handle || siteConfig.handle || '@X1a0hu';
+  const shelfTitle = shelfConfig.title || '拾音';
   setText('shelf-title', shelfTitle);
-  setText('shelf-handle', handle);
-  setText('post-author', siteName);
-  setText('post-avatar', siteName.slice(0, 1).toUpperCase());
+  setText('shelf-subtitle', shelfConfig.subtitle);
+  document.title = `${shelfTitle} · ${siteName}`;
 
-  const totalCurated = categoryKeys.reduce(
-    (sum, key) => sum + (Array.isArray(categories[key]?.items) ? categories[key].items.length : 0),
-    0
-  );
-  setText('total-count', totalCurated.toLocaleString());
+  const summaryParts = categoryKeys.map(key => {
+    const cat = categories[key];
+    const cnt = Array.isArray(cat?.items) ? cat.items.length : 0;
+    const unit = key === 'albums' ? '张' : key === 'tickets' ? '场' : '部';
+    return `${cnt} ${unit}${cat?.cnLabel || key}`;
+  });
+  setText('shelf-summary', summaryParts.join(' · '));
 
   function itemFormats(item) {
     return Array.isArray(item?.formats) ? item.formats.filter(Boolean) : [];
@@ -187,11 +188,10 @@
 
   function applyTheme(theme) {
     const isDark = theme === 'dark';
-    if (isDark) rootEl.setAttribute('data-theme', 'dark');
-    else rootEl.removeAttribute('data-theme');
+    rootEl.setAttribute('data-theme', isDark ? 'dark' : 'light');
     themeBtn?.classList.toggle('is-on', isDark);
     themeBtn?.setAttribute('aria-pressed', String(isDark));
-    if (metaThemeColor) metaThemeColor.content = isDark ? '#000000' : '#f3f2ed';
+    if (metaThemeColor) metaThemeColor.content = isDark ? '#0e0d0c' : '#f4f2ec';
   }
 
   applyTheme(shelfConfig.defaultTheme === 'dark' ? 'dark' : 'light');
@@ -324,9 +324,13 @@
       }
 
       const label = document.createElement('span');
-      label.textContent = cat.label || key;
+      label.textContent = cat.cnLabel || cat.label || key;
 
-      btn.append(mini, label);
+      const cnt = document.createElement('span');
+      cnt.className = 'tab-count';
+      cnt.textContent = String(items.length);
+
+      btn.append(mini, label, cnt);
       btn.addEventListener('click', () => {
         if (activeCategory === key) return;
         activeCategory = key;
@@ -1472,7 +1476,7 @@
   function renderIndexList() {
     if (!titlesEl) return;
     titlesEl.textContent = '';
-    setText('index-summary', `Showing ${visibleItems.length} items`);
+    setText('index-summary', `共 ${visibleItems.length} 项`);
 
     visibleItems.forEach((item, idx) => {
       const li = document.createElement('li');

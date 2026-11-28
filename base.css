@@ -1,0 +1,415 @@
+/* ==========================================================================
+   HULAB 全站统一设计系统 (base.css)
+   视觉母语：暖炭暗房 · 象牙白墨 · 琥珀微光 · 宋体人文页头
+   ========================================================================== */
+
+:root {
+  /* 统一暗房暖炭色板（源自「浮光」画廊 OKLCH Hue-60 体系） */
+  --bg: oklch(12.2% 0.008 62);
+  --surface: oklch(15.4% 0.009 60);
+  --surface-raised: oklch(18.6% 0.01 60);
+  --surface-well: oklch(10.4% 0.008 60);
+  --surface-backdrop: oklch(9.6% 0.008 60 / 0.84);
+
+  --ink: oklch(93.5% 0.008 78);
+  --ink-secondary: oklch(78.5% 0.01 74);
+  --muted: oklch(64% 0.011 70);
+  --dim: oklch(46% 0.01 64);
+
+  --border: oklch(24.5% 0.01 60);
+  --border-strong: oklch(34% 0.012 62);
+
+  --accent: oklch(76% 0.135 68);
+  --accent-soft: oklch(76% 0.135 68 / 0.14);
+  --accent-ink: oklch(14% 0.01 60);
+
+  /* 统一字体体系 */
+  --font-display: "Space Grotesk", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  --font-mono: "JetBrains Mono", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* 统一空间与圆角尺度 */
+  --gutter: clamp(20px, 4vw, 48px);
+  --container-max: 1200px;
+  --reading-max: 720px;
+  --r-xs: 4px;
+  --r-s: 8px;
+  --r-m: 12px;
+  --r-l: 16px;
+  --pill: 999px;
+
+  color-scheme: dark;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 可选暖白纸张模式（供书影音明暗切换使用，依然保持同色相暖感） */
+:root[data-theme="light"] {
+  --bg: #f4f2ec;
+  --surface: #faf9f5;
+  --surface-raised: #ffffff;
+  --surface-well: #ece9e0;
+  --surface-backdrop: rgba(244, 242, 236, 0.86);
+
+  --ink: #181715;
+  --ink-secondary: #3d3b36;
+  --muted: #6e6a61;
+  --dim: #9b968c;
+
+  --border: #dfdcd2;
+  --border-strong: #c8c4b8;
+
+  --accent: #b87324;
+  --accent-soft: rgba(184, 115, 36, 0.12);
+  --accent-ink: #faf9f5;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 280px;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.sr-only,
+.skip-link:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link:focus {
+  position: fixed;
+  z-index: 100;
+  top: 16px;
+  left: 16px;
+  padding: 10px 16px;
+  border-radius: var(--r-s);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   全局页面骨架 (.site-shell / .site-container)
+   ========================================================================== */
+
+.site-shell {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100svh;
+}
+
+.site-container {
+  width: min(var(--container-max), 100%);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ==========================================================================
+   全局统一顶部导航 (.site-header)
+   ========================================================================== */
+
+.site-header {
+  position: relative;
+  z-index: 30;
+  width: min(var(--container-max), 100%);
+  margin-inline: auto;
+  padding: 22px var(--gutter) 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--ink);
+  transition: opacity .2s ease;
+}
+
+.site-brand:hover {
+  opacity: .82;
+}
+
+.site-brand-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.site-brand-sep {
+  color: var(--dim);
+  font-weight: 400;
+}
+
+.site-brand-section {
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.site-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 11px;
+  border-radius: var(--pill);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color .2s ease, background-color .2s ease;
+}
+
+.site-nav-link:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.site-nav-link[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--accent-soft);
+}
+
+.site-nav-link[aria-current="page"]::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 2px;
+}
+
+.site-nav-ext {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--dim);
+}
+
+/* ==========================================================================
+   全局统一子频道页头 (.page-hero)
+   ========================================================================== */
+
+.page-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+  align-items: end;
+  gap: 24px 32px;
+  padding-top: 24px;
+  padding-bottom: 36px;
+}
+
+.page-eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.page-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(44px, 5.5vw, 68px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.page-intro {
+  justify-self: end;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  text-align: right;
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.68;
+  color: var(--ink-secondary);
+}
+
+.page-meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   全局统一页脚 (.site-footer)
+   ========================================================================== */
+
+.site-footer {
+  width: min(var(--container-max), 100%);
+  margin-inline: auto;
+  padding: 28px var(--gutter) max(28px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
+  border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.site-footer-links a {
+  color: var(--muted);
+  transition: color .2s ease;
+}
+
+.site-footer-links a:hover {
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   响应式适配
+   ========================================================================== */
+
+@media (max-width: 820px) {
+  .page-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 14px;
+    padding-top: 16px;
+    padding-bottom: 28px;
+  }
+
+  .page-intro {
+    justify-self: start;
+    align-items: flex-start;
+    text-align: left;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-header {
+    padding-top: 16px;
+    padding-bottom: 10px;
+    gap: 10px 12px;
+  }
+
+  .site-nav {
+    width: 100%;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-nav-link {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

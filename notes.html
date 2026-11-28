@@ -1,2 +1,78 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#050709"><title>笔记 · HULAB</title><link rel="icon" href="./favicon.svg?v=hulab"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600&family=Space+Grotesk:wght@500;700&display=swap"><link rel="stylesheet" href="./styles.css?v=hulab-3"></head><body class="document-page"><article><p class="panel-eyebrow">NOTES & THOUGHTS</p><h1>留一点空间，给想法。</h1><p>这里会慢慢收集我的学习笔记、项目记录和偶尔冒出的灵感。</p><div class="empty-note"><span class="small-star" aria-hidden="true">✳</span><p>第一篇笔记，留给下次灵感。</p><span>COMING SOON</span></div><a class="back-link" href="./">← 回到首页</a></article></body></html>
+<html lang="zh-CN" id="top">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e0d0c" />
+    <meta name="description" content="手记，HULAB 的日常笔记、代码记录与随想。" />
+    <meta property="og:title" content="手记 · HULAB" />
+    <meta property="og:description" content="留一点空间，给慢下来的想法与日常折腾记录。" />
+    <meta property="og:type" content="website" />
+    <title>手记 · HULAB</title>
+    <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&family=Space+Grotesk:wght@500;700&display=swap" />
+    <link rel="stylesheet" href="./base.css?v=hulab-20" />
+    <link rel="stylesheet" href="./notes.css?v=hulab-20" />
+    <script defer src="./site.config.js?v=hulab-20"></script>
+    <script defer src="./shell.js?v=hulab-20"></script>
+    <script defer src="./notes.config.js?v=hulab-20"></script>
+    <script defer src="./notes.js?v=hulab-20"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#notes-main">跳到笔记正文</a>
+
+    <div class="site-shell">
+      <header class="site-header" data-site-header data-page="notes">
+        <a class="site-brand" href="./">
+          <span class="site-brand-name">HULAB</span>
+          <span class="site-brand-sep" aria-hidden="true">/</span>
+          <span class="site-brand-section">手记</span>
+        </a>
+        <nav class="site-nav" aria-label="全站主导航">
+          <a class="site-nav-link" href="./">首页</a>
+          <a class="site-nav-link" href="./gallery.html">画廊</a>
+          <a class="site-nav-link" href="./shelf.html">书影音</a>
+          <a class="site-nav-link" href="./notes.html" aria-current="page">笔记</a>
+          <a class="site-nav-link" href="./about.html">关于</a>
+        </nav>
+      </header>
+
+      <main class="notes-main site-container" id="notes-main">
+        <div id="notes-index-view">
+          <section class="page-hero">
+            <div>
+              <p class="page-eyebrow">NOTES &amp; ESSAYS</p>
+              <h1 class="page-title" id="notes-title">手记</h1>
+            </div>
+            <div class="page-intro">
+              <p class="page-subtitle" id="notes-subtitle">留一点空间，给慢下来的想法与日常折腾记录。</p>
+              <p class="page-meta" id="notes-count"></p>
+            </div>
+          </section>
+
+          <div class="notes-Toolbar" id="notes-filters" hidden role="group" aria-label="按标签筛选笔记"></div>
+          <div class="notes-list" id="notes-list"></div>
+        </div>
+
+        <article class="note-reader" id="notes-reader-view" hidden aria-labelledby="reader-title">
+          <a class="reader-back" id="reader-back" href="./notes.html">← 返回手记列表</a>
+          <header class="reader-head">
+            <div class="reader-meta">
+              <time id="reader-date"></time>
+              <span aria-hidden="true">·</span>
+              <span id="reader-tag"></span>
+            </div>
+            <h1 class="reader-title" id="reader-title"></h1>
+          </header>
+          <div class="prose" id="reader-prose"></div>
+        </article>
+      </main>
+
+      <footer class="site-footer" data-site-footer>
+        <p>© 2026 HULAB</p>
+      </footer>
+    </div>
+  </body>
+</html>

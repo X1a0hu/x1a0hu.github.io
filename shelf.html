@@ -1,44 +1,56 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN" data-theme="dark" id="top">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#000000" id="meta-theme-color" />
-    <meta name="description" content="HULAB 的书影音与实体唱片架，收纳真实拥有的 CD、黑胶、白胶、演出票根，以及读过的书和看过的影视。" />
-    <meta property="og:title" content="书影音 · HULAB" />
-    <meta property="og:description" content="实体唱片（CD / 黑胶 / 白胶）、演出票根、书与影视收藏架。" />
+    <meta name="theme-color" content="#0e0d0c" id="meta-theme-color" />
+    <meta name="description" content="拾音，HULAB 的实体唱片与演出现场归档，收纳真实拥有的 CD、白胶与演出票根。" />
+    <meta property="og:title" content="拾音 · HULAB" />
+    <meta property="og:description" content="实体唱片（CD / 白胶）与演出现场票根收藏室。" />
     <meta property="og:type" content="website" />
-    <title>书影音 · HULAB</title>
+    <title>拾音 · HULAB</title>
     <link rel="icon" href="./favicon.svg?v=hulab" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&family=Space+Grotesk:wght@500;700&display=swap" />
-    <link rel="stylesheet" href="./shelf.css?v=hulab-11" />
-    <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./shelf.config.js?v=hulab-9"></script>
-    <script defer src="./shelf.js?v=hulab-10"></script>
+    <link rel="stylesheet" href="./base.css?v=hulab-20" />
+    <link rel="stylesheet" href="./shelf.css?v=hulab-20" />
+    <script defer src="./site.config.js?v=hulab-20"></script>
+    <script defer src="./shell.js?v=hulab-20"></script>
+    <script defer src="./shelf.config.js?v=hulab-20"></script>
+    <script defer src="./shelf.js?v=hulab-20"></script>
   </head>
-  <body>
-    <div id="tfyi-bar">
-      <a class="tfyi-back" href="./">← HULAB</a>
-      <div class="tfyi-right">
-        <span>My Shelf · <strong id="shelf-handle">@X1a0hu</strong></span>
-      </div>
-    </div>
+  <body class="shelf-body">
+    <a class="skip-link" href="#media-stage">跳到藏品陈列架</a>
 
-    <div class="wrap">
-      <header class="shelf-header">
-        <h1 class="sr-only" id="shelf-title">书影音</h1>
-        <div class="live" aria-label="馆藏作品总数">
-          <canvas id="globe" width="88" height="88" aria-hidden="true"></canvas>
-          <div class="live-meta">
-            <strong id="total-count">0</strong>
-            <span>件馆藏</span>
-          </div>
-        </div>
+    <div class="site-shell">
+      <header class="site-header" data-site-header data-page="shelf">
+        <a class="site-brand" href="./">
+          <span class="site-brand-name">HULAB</span>
+          <span class="site-brand-sep" aria-hidden="true">/</span>
+          <span class="site-brand-section">拾音</span>
+        </a>
+        <nav class="site-nav" aria-label="全站主导航">
+          <a class="site-nav-link" href="./">首页</a>
+          <a class="site-nav-link" href="./gallery.html">画廊</a>
+          <a class="site-nav-link" href="./shelf.html" aria-current="page">书影音</a>
+          <a class="site-nav-link" href="./notes.html">笔记</a>
+          <a class="site-nav-link" href="./about.html">关于</a>
+        </nav>
       </header>
 
-      <main>
+      <main class="shelf-main site-container" aria-labelledby="shelf-title">
+        <section class="page-hero shelf-hero">
+          <div>
+            <p class="page-eyebrow">PHYSICAL RECORDS &amp; LIVE ARCHIVE</p>
+            <h1 class="page-title" id="shelf-title">拾音</h1>
+          </div>
+          <div class="page-intro">
+            <p class="page-subtitle" id="shelf-subtitle">把真正拥有的实体唱片与去过的演出现场，安静收进架子里。</p>
+            <p class="page-meta" id="shelf-summary"></p>
+          </div>
+        </section>
+
         <nav class="tabs" id="tabs" aria-label="媒介分类切换"></nav>
 
         <section class="box share-box" aria-labelledby="shelf-heading">
@@ -46,8 +58,8 @@
             <div class="where-row">
               <div class="step-row">
                 <h2 class="step" id="shelf-heading">Albums · 实体唱片</h2>
-                <span class="count-pill" id="category-count">10</span>
-                <div class="segmented" id="era-picker" role="group" aria-label="载体或时间筛选"></div>
+                <span class="count-pill" id="category-count">12</span>
+                <div class="segmented" id="era-picker" role="group" aria-label="载体或年份筛选"></div>
               </div>
 
               <div class="right-tools">
@@ -61,7 +73,7 @@
                     <span class="opt-label">封面</span>
                     <span class="opt-track"><span class="opt-thumb"></span></span>
                   </button>
-                  <button type="button" class="opt-toggle is-on" id="toggle-theme" aria-pressed="true" title="切换暗色/亮色主题">
+                  <button type="button" class="opt-toggle is-on" id="toggle-theme" aria-pressed="true" title="切换暗房/暖纸主题">
                     <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
                     <span class="opt-track"><span class="opt-thumb"></span></span>
                   </button>
@@ -73,26 +85,7 @@
           </div>
 
           <div class="well">
-            <div class="well-header">
-              <span class="well-label" id="well-label">Preview · Physical Shelf</span>
-              <button type="button" class="btn-secondary" id="download-png">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                <span>Download PNG</span>
-              </button>
-            </div>
-
             <div class="post" id="post-card">
-              <div class="post-head">
-                <div class="post-avatar" id="post-avatar" aria-hidden="true">H</div>
-                <div class="post-byline">
-                  <div class="by-row">
-                    <strong id="post-author">HULAB</strong>
-                    <span class="by-handle" id="post-handle">@X1a0hu · 实体收藏</span>
-                  </div>
-                  <p class="post-caption" id="post-caption">实体唱片 · 10 项记录</p>
-                </div>
-              </div>
-
               <div class="media-stage" id="media-stage" aria-live="polite"></div>
             </div>
 
@@ -111,15 +104,15 @@
                 <p class="spotlight-note" id="spotlight-note"></p>
               </div>
               <div class="spotlight-nav">
-                <button type="button" class="spot-btn" id="spot-prev" aria-label="上一部作品">←</button>
-                <button type="button" class="spot-btn" id="spot-next" aria-label="下一部作品">→</button>
+                <button type="button" class="spot-btn" id="spot-prev" aria-label="上一项">←</button>
+                <button type="button" class="spot-btn" id="spot-next" aria-label="下一项">→</button>
               </div>
             </div>
 
             <div class="index-drawer">
               <div class="index-header">
-                <span id="index-title">Full Shelf Index · 点击任意条目定位并查看详情</span>
-                <span id="index-summary">Showing 10 items</span>
+                <span id="index-title">馆藏索引 · 点击任意条目定位详情</span>
+                <span id="index-summary">共 12 项</span>
               </div>
               <ol class="lines" id="titles"></ol>
             </div>
@@ -127,13 +120,8 @@
         </section>
       </main>
 
-      <footer class="foot">
-        <div class="tick">
-          <span class="live-dot" aria-hidden="true"></span>
-          <strong>Live</strong>
-          <span class="tick-text" id="tick-text">点击架上的 CD 侧脊、黑胶/白胶唱片或演出票根，即可抽取查看版本详情与短评</span>
-        </div>
-        <a class="about-link" href="./">← 返回 HULAB 首页</a>
+      <footer class="site-footer" data-site-footer>
+        <p>© 2026 HULAB</p>
       </footer>
     </div>
   </body>

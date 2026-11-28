@@ -1,38 +1,49 @@
 (() => {
   'use strict';
+
   const config = window.SITE_CONFIG || {};
-  const setText = (id, value) => { if (value) document.getElementById(id).textContent = value; };
-  setText('site-title', config.name);
-  setText('footer-name', config.name);
-  setText('about-description', config.about);
-  document.querySelectorAll('[data-profile-name]').forEach(node => { node.textContent = config.name || 'HULAB'; });
-  document.getElementById('year').textContent = new Date().getFullYear();
-  if (config.name) document.title = `${config.name} · 个人空间`;
-  document.querySelector('meta[property="og:title"]').content = document.title;
-  function setLink(selector, value) {
-    try {
-      const url = new URL(value);
-      if (url.protocol === 'https:') document.querySelectorAll(selector).forEach(node => { node.href = url.href; });
-    } catch { /* Keep the working HTML fallback if the configuration is invalid. */ }
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el && value) el.textContent = value;
+  };
+
+  setText('site-title', config.name || 'HULAB');
+  setText('site-tagline', config.tagline || config.about);
+  if (config.handle) {
+    setText('hero-handle', `PERSONAL SPACE · ${config.handle}`);
   }
-  setLink('#github-link, [data-github-link]', config.github);
-  setLink('#projects-link', config.projects);
-  setLink('#source-link', config.source);
+
+  if (config.name) {
+    document.title = `${config.name} · 个人空间`;
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.content = document.title;
+  }
 
   const canvas = document.getElementById('fluid-background');
   const hint = document.getElementById('interaction-hint');
+  if (!canvas) return;
+
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let engine;
   let unavailable = false;
   let introPlayed = false;
   let introTimer;
   const activePointers = new Set();
-  const stopped = () => motion.matches || document.hidden || Boolean(document.querySelector('dialog[open]'));
-  function stopIntro() { clearTimeout(introTimer); introTimer = undefined; }
+  const stopped = () => motion.matches || document.hidden;
+
+  function stopIntro() {
+    clearTimeout(introTimer);
+    introTimer = undefined;
+  }
+
   function releasePointers() {
-    activePointers.forEach(id => { engine?.end(id); if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id); });
+    activePointers.forEach(id => {
+      engine?.end(id);
+      if (canvas.hasPointerCapture?.(id)) canvas.releasePointerCapture(id);
+    });
     activePointers.clear();
   }
+
   function openingColors() {
     if (introPlayed || stopped() || !engine || unavailable) return;
     introPlayed = true;
@@ -40,63 +51,62 @@
     let index = 0;
     const splash = () => {
       if (stopped() || unavailable) return;
-      const bounds = document.querySelector('.hero').getBoundingClientRect();
-      const x = bounds.left + bounds.width * (.14 + .72 * (index + Math.random()) / total);
-      const y = bounds.top + bounds.height * (.2 + Math.random() * .5);
+      const heroEl = document.querySelector('.hero');
+      if (!heroEl) return;
+      const bounds = heroEl.getBoundingClientRect();
+      const x = bounds.left + bounds.width * (0.14 + (0.72 * (index + Math.random())) / total);
+      const y = bounds.top + bounds.height * (0.2 + Math.random() * 0.5);
       engine.start('intro', x, y);
       engine.end('intro');
       if (++index < total) introTimer = setTimeout(splash, 240);
     };
     splash();
   }
+
   function updateMotion() {
     const pause = stopped();
-    if (!engine && !unavailable && !pause) {
-      try { engine = window.createFluid(canvas); canvas.dataset.renderer = 'webgl'; }
-      catch { unavailable = true; canvas.dataset.renderer = 'unavailable'; canvas.hidden = true; }
+    if (!engine && !unavailable && !pause && typeof window.createFluid === 'function') {
+      try {
+        engine = window.createFluid(canvas);
+        canvas.dataset.renderer = 'webgl';
+      } catch {
+        unavailable = true;
+        canvas.dataset.renderer = 'unavailable';
+        canvas.hidden = true;
+      }
     }
     engine?.setPaused(pause);
     document.body.classList.toggle('motion-paused', pause);
-    hint.hidden = pause || unavailable;
-    if (pause) { stopIntro(); releasePointers(); }
-    else openingColors();
+    if (hint) hint.hidden = pause || unavailable;
+    if (pause) {
+      stopIntro();
+      releasePointers();
+    } else {
+      openingColors();
+    }
   }
-  document.querySelectorAll('[data-dialog]').forEach(link => {
-    link.addEventListener('click', event => {
-      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-      const dialog = document.getElementById(link.dataset.dialog);
-      if (!dialog?.showModal) return;
-      event.preventDefault();
-      dialog.showModal();
-      updateMotion();
-    });
-  });
-  document.querySelectorAll('dialog').forEach(dialog => {
-    dialog.querySelector('.close-panel').addEventListener('click', () => dialog.close());
-    dialog.addEventListener('close', updateMotion);
-    dialog.addEventListener('click', event => {
-      const rect = dialog.getBoundingClientRect();
-      if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
-    });
-  });
+
   window.addEventListener('pointerdown', event => {
     if (stopped() || unavailable || !engine || (event.pointerType === 'mouse' && event.button !== 0)) return;
-    if (!(event.target instanceof Element) || !event.target.closest('.hero')) return;
+    if (!(event.target instanceof Element) || !event.target.closest('.hero') || event.target.closest('a, button')) return;
     introPlayed = true;
     stopIntro();
     activePointers.add(event.pointerId);
     engine.start(event.pointerId, event.clientX, event.clientY);
     document.body.classList.add('has-interacted');
-    try { canvas.setPointerCapture(event.pointerId); } catch { /* Window listeners cover uncaptured pointers. */ }
+    try { canvas.setPointerCapture(event.pointerId); } catch { /* ignore */ }
   }, { passive: true });
+
   window.addEventListener('pointermove', event => {
     if (activePointers.has(event.pointerId)) engine?.move(event.pointerId, event.clientX, event.clientY);
   }, { passive: true });
+
   function endPointer(event) {
     activePointers.delete(event.pointerId);
     engine?.end(event.pointerId);
-    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    if (canvas.hasPointerCapture?.(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
   }
+
   window.addEventListener('pointerup', endPointer, { passive: true });
   window.addEventListener('pointercancel', endPointer, { passive: true });
   window.addEventListener('blur', releasePointers);
@@ -104,7 +114,12 @@
   document.addEventListener('visibilitychange', updateMotion);
   motion.addEventListener('change', updateMotion);
   window.addEventListener('pageshow', updateMotion);
-  window.addEventListener('pagehide', () => { stopIntro(); releasePointers(); engine?.setPaused(true); });
+  window.addEventListener('pagehide', () => {
+    stopIntro();
+    releasePointers();
+    engine?.setPaused(true);
+  });
+
   canvas.addEventListener('webglcontextlost', event => {
     event.preventDefault();
     stopIntro();
@@ -114,8 +129,14 @@
     unavailable = true;
     canvas.hidden = true;
     canvas.dataset.renderer = 'unavailable';
-    hint.hidden = true;
+    if (hint) hint.hidden = true;
   });
-  canvas.addEventListener('webglcontextrestored', () => { unavailable = false; canvas.hidden = false; updateMotion(); });
+
+  canvas.addEventListener('webglcontextrestored', () => {
+    unavailable = false;
+    canvas.hidden = false;
+    updateMotion();
+  });
+
   updateMotion();
 })();

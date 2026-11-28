@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" id="top">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -13,37 +13,45 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" />
-    <link rel="stylesheet" href="./styles.css?v=hulab-3" />
-    <link rel="stylesheet" href="./gallery.css?v=hulab-18" />
-    <script defer src="./site.config.js?v=hulab-2"></script>
-    <script defer src="./gallery.config.js?v=hulab-18"></script>
-    <script defer src="./gallery.js?v=hulab-18"></script>
+    <link rel="stylesheet" href="./base.css?v=hulab-20" />
+    <link rel="stylesheet" href="./gallery.css?v=hulab-20" />
+    <script defer src="./site.config.js?v=hulab-20"></script>
+    <script defer src="./shell.js?v=hulab-20"></script>
+    <script defer src="./gallery.config.js?v=hulab-20"></script>
+    <script defer src="./gallery.js?v=hulab-20"></script>
   </head>
   <body class="gallery-body">
     <a class="skip-link" href="#gallery-grid">跳到影像胶卷</a>
 
-    <div class="gallery-page">
-      <header class="gallery-topbar gallery-container">
-        <a class="gallery-brand" href="./" aria-label="HULAB，回到首页">
-          <span class="brand-name">HULAB</span>
-          <span class="brand-divider" aria-hidden="true">/</span>
-          <span class="brand-section">影像集</span>
+    <div class="site-shell gallery-page">
+      <header class="site-header" data-site-header data-page="gallery">
+        <a class="site-brand" href="./">
+          <span class="site-brand-name">HULAB</span>
+          <span class="site-brand-sep" aria-hidden="true">/</span>
+          <span class="site-brand-section">浮光</span>
         </a>
-        <a class="back-home-link" href="./">返回首页 <span aria-hidden="true">↗</span></a>
+        <nav class="site-nav" aria-label="全站主导航">
+          <a class="site-nav-link" href="./">首页</a>
+          <a class="site-nav-link" href="./gallery.html" aria-current="page">画廊</a>
+          <a class="site-nav-link" href="./shelf.html">书影音</a>
+          <a class="site-nav-link" href="./notes.html">笔记</a>
+          <a class="site-nav-link" href="./about.html">关于</a>
+        </nav>
       </header>
 
       <main class="gallery-main" aria-labelledby="gallery-title">
-        <section class="gallery-hero gallery-container">
+        <section class="page-hero site-container">
           <div class="gallery-heading">
-            <h1 class="gallery-title" id="gallery-title">浮光</h1>
+            <p class="page-eyebrow">35MM VISUAL JOURNAL</p>
+            <h1 class="page-title" id="gallery-title">浮光</h1>
           </div>
-          <div class="gallery-intro">
-            <p class="gallery-subtitle" id="gallery-subtitle">你总不忘提醒，再写上一些实况吧。</p>
-            <p class="archive-range" id="archive-range"></p>
+          <div class="page-intro">
+            <p class="page-subtitle" id="gallery-subtitle">你总不忘提醒，再写上一些实况吧。</p>
+            <p class="page-meta" id="archive-range"></p>
           </div>
         </section>
 
-        <section class="gallery-controls gallery-container" aria-label="画廊分类筛选">
+        <section class="gallery-controls site-container" aria-label="画廊分类筛选">
           <div class="filter-bar" id="filter-bar" role="group" aria-label="按分类筛选照片"></div>
         </section>
 
@@ -55,7 +63,7 @@
           </div>
         </section>
 
-        <div class="gallery-container">
+        <div class="site-container">
           <aside class="now-card" id="now-card" hidden>
             <div class="now-badge-wrap">
               <span class="live-pulse" aria-hidden="true"></span>
@@ -71,9 +79,8 @@
         </div>
       </main>
 
-      <footer class="gallery-footer gallery-container">
+      <footer class="site-footer" data-site-footer>
         <p>© <span id="year">2026</span> <span id="footer-name">HULAB</span></p>
-        <a href="#gallery-title">回到顶部 <span aria-hidden="true">↑</span></a>
       </footer>
     </div>
 
